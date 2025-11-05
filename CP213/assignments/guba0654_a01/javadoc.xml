@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="A01" default="javadoc">
+    <target name="javadoc">
+        <javadoc doctitle="${ant.project.name}" access="public" additionalparam="-html5" author="true" classpath="." destdir="doc"  nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="cp213" source="10" sourcepath="src" splitindex="true" use="true" version="true"/>
+    </target>
+</project>
