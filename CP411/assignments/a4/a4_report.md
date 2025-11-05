@@ -35,27 +35,31 @@ Copy the question and write your answer here.
 
 ### Q2.1 Hidden surface removal 
 
-Complete? Yes or No 
+Complete? Yes
 
 <!--If you answer Yes, insert one or more screenshot images to show the completion.-->
 
-![Image caption](images/demo.png){width=90%}
+![Image caption](images/A4_q2.1-1.png){width=90%}
+![Image caption](images/A4_q2.1-2.png){width=90%}
 
 <!-- If No, add a short description to describe the issues encountered.-->
 
 ### Q2.2 Lighting and shading 
 
-Complete? Yes or No 
+Complete? Yes
 
 <!--If you answer Yes, insert one or more screenshot images to show the completion.-->
 
-![Image caption](images/demo.png){width=90%}
+![Image caption](images/A4_q2.2-1.png){width=90%}
+![Image caption](images/A4_q2.2-2.png){width=90%}
+![Image caption](images/A4_q2.2-3.png){width=90%}
+![Image caption](images/A4_q2.2-4.png){width=90%}
 
 <!-- If No, add a short description to describe the issues encountered.-->
 
 ### Q2.3 Animation 
 
-Complete? Yes or No 
+Complete? Yes
 
 <!--If you answer Yes, insert one or more screenshot images to show the completion.-->
 
