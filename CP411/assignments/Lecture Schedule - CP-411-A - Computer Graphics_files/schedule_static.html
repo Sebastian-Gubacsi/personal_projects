@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<!-- saved from url=(0106)https://mylearningspace.wlu.ca/content/enforced/598113-587.202509/release/assignments/a2/a2.html?ou=598113 -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang=""><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>CP411-A2</title>
+  <style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style>
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="./book.css">
+
+  <!-- CSS source -->
+  <link href="./assignment_style.css" type="text/css" rel="stylesheet">
+<script>window.addEventListener('message', function(event) { 
+					if( !event.data ) {
+						return;
+					}
+
+					let params;
+					try {
+						params = JSON.parse( event.data );
+					}
+					catch {
+						return;
+					}
+					if( !params.subject || params.subject !== 'lti.frameResize' ) {
+						return;
+					}
+
+					const MAX_FRAME_HEIGHT = 10000;
+					if( !params.height || params.height < 1 || params.height > MAX_FRAME_HEIGHT ) {
+						console.warn( 'Invalid height value received, aborting' );
+						return;
+					}
+					const el = document.getElementsByTagName( 'iframe' );
+					for ( let i=0; i < el.length; i++ ) {
+						if( el[i].contentWindow === event.source ) {
+							el[i].style.height = params.height + 'px';
+
+							console.info( 'Setting iFrame height to ' + params.height );
+
+							if( el[i].getAttribute('lockwidth') !== 'true'){
+								el[i].style.width = '100%';
+								console.info( 'Setting iFrame width to 100%' );
+							}
+						}
+					}
+				});</script><script src="./embeds.js.download" type="module"></script><script>document.addEventListener('DOMContentLoaded', function() {
+					window.D2L.EmbedRenderer.renderEmbeds(document.body);
+				});</script><script src="./mathjax.js.download" type="module"></script><script>document.addEventListener('DOMContentLoaded', function() {
+						if (document.querySelector('math, .d2l-element, .d2l-cplus-layout') || /\$\$|\\\(|\\\[|\\begin{|\\ref{|\\eqref{/.test(document.body.innerHTML)) {
+							document.querySelectorAll('mspace[linebreak="newline"]').forEach(elm => {
+								elm.setAttribute('style', 'display: block; height: 0.5rem;');
+							});
+
+							document.querySelectorAll('math mmultiscripts > none').forEach(elm => {
+								const mrow = document.createElementNS('http://www.w3.org/1998/Math/MathML', 'mrow');
+								elm.replaceWith(mrow);
+							});
+
+							window.D2L.MathJax.loadMathJax({
+								outputScale: 1.5,
+								renderLatex: false,
+								enableMML3Support: false
+							});
+						}
+					});</script><script src="./prism.js.download" type="module"></script><script>document.addEventListener('DOMContentLoaded', function() {
+					document.querySelectorAll('.d2l-code').forEach(code => {
+						window.D2L.Prism.formatCodeElement(code);
+					});
+				});</script><script src="./creator.js.download" type="module"></script><script>document.addEventListener('DOMContentLoaded', async () => {
+					const activities = [];
+					const practices = [];
+					const allPractices = document.querySelectorAll('.d2l-practice');
+					const elements = document.querySelectorAll('.d2l-element');
+					let layouts = [...document.querySelectorAll('.d2l-cplus-layout')];
+					const tables = document.querySelectorAll('table');
+					const contentStylerStyleLinks = document.querySelectorAll('head > link[href="https://templates.lcs.brightspace.com/lib/assets/css/styles.min.css"]');
+					const contentStylerOverides = document.querySelectorAll('head > link[href^="/d2l/le/contentstyler/"][data-override="override"]');
+
+					layouts = layouts.filter((layout) => layout.closest('.d2l-element.mceNonEditable') === null);
+
+					for (const practice of allPractices) {
+						const activityContainer = practice.hasAttribute('data-d2l-activity-href');
+						if (activityContainer) {
+							activities.push(practice);
+						}
+						else {
+							practices.push(practice);
+						}
+					}
+
+					if (layouts.length > 0) {
+						window.D2L.Creator.convertLayouts(layouts);
+					}
+					if (elements.length > 0) {
+						window.D2L.Creator.convertElements(elements, 598113, '/content/enforced/598113-587.202509/');
+					}
+					if (activities.length > 0) {
+						window.D2L.Creator.convertPracticeActivities(activities, 598113, '/content/enforced/598113-587.202509/');
+					}
+					if (practices.length > 0) {
+						window.D2L.Creator.convertPractices(practices, 598113, '/content/enforced/598113-587.202509/');
+					}
+					if (contentStylerStyleLinks.length > 0 && contentStylerOverides.length > 0 && tables.length > 0) {
+						window.D2L.Creator.wrapTables(tables);
+					}
+				});</script><script>function lti_launch( vars, target ) {
+						var query = '';
+						var new_tab = false;
+
+						for(var key in vars) {
+							if(query.length == 0) {
+								query += '?' + key + '=' + encodeURIComponent(vars[key]);
+							}
+							else {
+								query += '&' + key + '=' + encodeURIComponent(vars[key]);
+							}
+						}
+
+						var url = '/d2l/customization/pearsonlti/598113/Launch' + query;(target == '_blank') ? window.open( url, '_blank' ) : location.replace( url );}</script><style id="d2l-colors">
+		html {
+			/* basic grays (lightest to darkest) */
+			--d2l-color-regolith: #f9fbff;
+			--d2l-color-sylvite: #f1f5fb;
+			--d2l-color-gypsum: #e3e9f1;
+			--d2l-color-mica: #cdd5dc;
+			--d2l-color-corundum: #b1b9be;
+			--d2l-color-chromite: #90989d;
+			--d2l-color-galena: #6e7477;
+			--d2l-color-tungsten: #494c4e;
+			--d2l-color-ferrite: #202122;
+
+			/* zircon */
+			--d2l-color-zircon-plus-2: #e0feff;
+			--d2l-color-zircon-plus-1: #00d2ed;
+			--d2l-color-zircon: #008eab;
+			--d2l-color-zircon-minus-1: #035670;
+
+			/* celestine */
+			--d2l-color-celestine-plus-2: #e8f8ff;
+			--d2l-color-celestine-plus-1: #29a6ff;
+			--d2l-color-celestine: #006fbf;
+			--d2l-color-celestine-minus-1: #004489;
+
+			/* amethyst */
+			--d2l-color-amethyst-plus-2: #f2f0ff;
+			--d2l-color-amethyst-plus-1: #8982ff;
+			--d2l-color-amethyst: #6038ff;
+			--d2l-color-amethyst-minus-1: #4500db;
+
+			/* fluorite */
+			--d2l-color-fluorite-plus-2: #f9ebff;
+			--d2l-color-fluorite-plus-1: #ce68fa;
+			--d2l-color-fluorite: #9d1fd4;
+			--d2l-color-fluorite-minus-1: #6900a0;
+
+			/* tourmaline */
+			--d2l-color-tourmaline-plus-2: #ffebf6;
+			--d2l-color-tourmaline-plus-1: #fd4e9d;
+			--d2l-color-tourmaline: #d40067;
+			--d2l-color-tourmaline-minus-1: #990056;
+
+			/* cinnabar */
+			--d2l-color-cinnabar-plus-2: #ffede8;
+			--d2l-color-cinnabar-plus-1: #ff575a;
+			--d2l-color-cinnabar: #cd2026;
+			--d2l-color-cinnabar-minus-1: #990006;
+
+			/* carnelian */
+			--d2l-color-carnelian-plus-1: #fff3e0;
+			--d2l-color-carnelian: #e87511;
+			--d2l-color-carnelian-minus-1: #ba4700;
+			--d2l-color-carnelian-minus-2: #7d2600;
+
+			/* citrine */
+			--d2l-color-citrine-plus-1: #fff9d6;
+			--d2l-color-citrine: #ffba59;
+			--d2l-color-citrine-minus-1: #c47400;
+			--d2l-color-citrine-minus-2: #7a4300;
+
+			/* peridot */
+			--d2l-color-peridot-plus-1: #efffd9;
+			--d2l-color-peridot: #8ad934;
+			--d2l-color-peridot-minus-1: #4a8f00;
+			--d2l-color-peridot-minus-2: #2f5e00;
+
+			/* olivine */
+			--d2l-color-olivine-plus-1: #e7ffe3;
+			--d2l-color-olivine: #46a661;
+			--d2l-color-olivine-minus-1: #027a21;
+			--d2l-color-olivine-minus-2: #005614;
+
+			/* malachite */
+			--d2l-color-malachite-plus-1: #e3fff5;
+			--d2l-color-malachite: #2de2c0;
+			--d2l-color-malachite-minus-1: #00a490;
+			--d2l-color-malachite-minus-2: #00635e;
+
+			/* primary accent */
+			--d2l-color-primary-accent-action: var(--d2l-color-celestine);
+			--d2l-color-primary-accent-indicator: var(--d2l-color-carnelian);
+
+			/* feedback */
+			--d2l-color-feedback-error: var(--d2l-color-cinnabar);
+			--d2l-color-feedback-warning: var(--d2l-color-carnelian);
+			--d2l-color-feedback-success: var(--d2l-color-olivine);
+			--d2l-color-feedback-action: var(--d2l-color-celestine);
+		}
+	</style><style id="d2l-typography-font-face">
+		
+	@font-face {
+	font-family: 'Lato';
+	font-style: normal;
+	font-weight: 400;
+	src:
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/Lato-400.woff2) format('woff2'),
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/Lato-400.woff) format('woff');
+}
+@font-face {
+	font-family: 'Lato';
+	font-style: normal;
+	font-weight: 700;
+	src:
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/Lato-700.woff2) format('woff2'),
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/Lato-700.woff) format('woff');
+}
+@font-face {
+	font-family: 'Noto Sans Thai';
+	font-style: normal;
+	font-weight: 400;
+	src:
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/NotoSansThai-Regular.woff2) format('woff2'),
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/NotoSansThai-Regular.woff) format('woff');
+}
+@font-face {
+	font-family: 'Noto Sans Thai';
+	font-style: normal;
+	font-weight: 700;
+	src:
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/NotoSansThai-Bold.woff2) format('woff2'),
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/NotoSansThai-Bold.woff) format('woff');
+}
+@font-face {
+	font-family: 'BC Sans';
+	font-style: normal;
+	font-weight: 300;
+	src:
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/BCSans-Light.woff2) format('woff2'),
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/BCSans-Light.woff) format('woff');
+}
+@font-face {
+	font-family: 'BC Sans';
+	font-style: normal;
+	font-weight: 400;
+	src:
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/BCSans-Regular.woff2) format('woff2'),
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/BCSans-Regular.woff) format('woff');
+}
+@font-face {
+	font-family: 'BC Sans';
+	font-style: normal;
+	font-weight: 700;
+	src:
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/BCSans-Bold.woff2) format('woff2'),
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/BCSans-Bold.woff) format('woff');
+}
+@font-face {
+	font-family: 'BC Sans';
+	font-style: italic;
+	font-weight: 300;
+	src:
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/BCSans-LightItalic.woff2) format('woff2'),
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/BCSans-LightItalic.woff) format('woff');
+}
+@font-face {
+	font-family: 'BC Sans';
+	font-style: italic;
+	font-weight: 400;
+	src:
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/BCSans-Italic.woff2) format('woff2'),
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/BCSans-Italic.woff) format('woff');
+}
+@font-face {
+	font-family: 'BC Sans';
+	font-style: italic;
+	font-weight: 700;
+	src:
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/BCSans-BoldItalic.woff2) format('woff2'),
+		url(https://s.brightspace.com/lib/fonts/0.6.4/assets/BCSans-BoldItalic.woff) format('woff');
+}
+	html {
+		--d2l-cursor-resize-inline-end: e-resize;
+		--d2l-cursor-resize-inline-start: w-resize;
+		--d2l-document-direction: ltr;
+		--d2l-inline-end: right;
+		--d2l-inline-start: left;
+		--d2l-length-factor: 1;
+		--d2l-mirror-transform: none;
+	}
+	html[dir="rtl"] {
+		--d2l-cursor-resize-inline-end: w-resize;
+		--d2l-cursor-resize-inline-start: e-resize;
+		--d2l-document-direction: rtl;
+		--d2l-inline-end: left;
+		--d2l-inline-start: right;
+		--d2l-length-factor: -1;
+		--d2l-mirror-transform: scale(-1, 1);
+	}
+
+	.d2l-typography {
+		color: var(--d2l-color-ferrite);
+		display: block;
+		font-family: "Lato", "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+		letter-spacing: 0.01rem;
+	}
+	
+		.d2l-typography {
+			font-size: 0.95rem;
+			font-weight: 400;
+			line-height: 1.4rem;
+		}
+		@media (max-width: 615px) {
+			.d2l-typography {
+				font-size: 0.8rem;
+				line-height: 1.2rem;
+			}
+		}
+	
+	.d2l-typography p {
+		margin: 1rem 0;
+	}
+
+	.d2l-typography:lang(ar), .d2l-typography :lang(ar) {
+		font-family: "Segoe UI", "Geeza Pro", sans-serif;
+	}
+	.d2l-typography:lang(ja), .d2l-typography :lang(ja) {
+		font-family: "Hiragino Kaku Gothic Pro", "Meiyro", sans-serif;
+	}
+	.d2l-typography:lang(ko), .d2l-typography :lang(ko) {
+		font-family: "Apple SD Gothic Neo", Dotum, sans-serif;
+	}
+	.d2l-typography:lang(th), .d2l-typography :lang(th), .d2l-typography:lang(tha), .d2l-typography :lang(tha) {
+		font-family: "Noto Sans Thai", system-ui, Tahoma;
+	}
+	.d2l-typography:lang(zh), .d2l-typography :lang(zh) {
+		font-family: "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+	}
+
+		
+		.d2l-typography .d2l-body-standard {
+			font-size: 0.95rem;
+			font-weight: 400;
+			line-height: 1.4rem;
+		}
+		@media (max-width: 615px) {
+			.d2l-typography .d2l-body-standard {
+				font-size: 0.8rem;
+				line-height: 1.2rem;
+			}
+		}
+	
+		
+		.d2l-typography .d2l-body-compact {
+			font-size: 0.8rem;
+			font-weight: 400;
+			line-height: 1.2rem;
+		}
+		
+	
+		
+		.d2l-typography .d2l-body-small {
+			color: var(--d2l-color-tungsten);
+			font-size: 0.7rem;
+			font-weight: 400;
+			line-height: 0.9rem;
+			margin: auto;
+		}
+		
+	
+		
+		.d2l-typography .d2l-label-text {
+			font-size: 0.7rem;
+			font-weight: 700;
+			letter-spacing: 0.2px;
+			line-height: 0.9rem;
+		}
+		
+	
+		
+		.d2l-typography .d2l-heading-1 {
+			font-size: 2rem;
+			font-weight: 400;
+			line-height: 2.4rem;
+			margin: 1.5rem 0 1.5rem 0;
+		}
+		@media (max-width: 615px) {
+			.d2l-typography .d2l-heading-1 {
+				font-size: 1.5rem;
+				line-height: 1.8rem;
+			}
+			
+		}
+	
+		
+		.d2l-typography .d2l-heading-2 {
+			font-size: 1.5rem;
+			font-weight: 400;
+			line-height: 1.8rem;
+			margin: 1.5rem 0 1.5rem 0;
+		}
+		@media (max-width: 615px) {
+			.d2l-typography .d2l-heading-2 {
+				font-size: 1rem;
+				font-weight: 700;
+				line-height: 1.5rem;
+			}
+			
+		}
+	
+		
+		.d2l-typography .d2l-heading-3 {
+			font-size: 1rem;
+			font-weight: 700;
+			line-height: 1.5rem;
+			margin: 1.5rem 0 1.5rem 0;
+		}
+		@media (max-width: 615px) {
+			.d2l-typography .d2l-heading-3 {
+				font-size: 0.8rem;
+				line-height: 1.2rem;
+			}
+			
+		}
+	
+		
+		.d2l-typography .d2l-heading-4 {
+			font-size: 0.8rem;
+			font-weight: 700;
+			line-height: 1.2rem;
+			margin: 1.5rem 0 1.5rem 0;
+		}
+	
+		
+		.d2l-typography .d2l-blockquote {
+			font-size: 0.8rem;
+			font-weight: 400;
+			line-height: 1.4rem;
+			margin-block: 0;
+			margin-inline: 0 1.2rem;
+			padding-block: 0.5rem 0;
+			padding-inline: 1.2rem 0;
+			position: relative;
+		}
+		.d2l-typography .d2l-blockquote::before {
+			content: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTEiIGhlaWdodD0iMTEiIHZpZXdCb3g9IjAgMCAyMiAyMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+Cgk8ZGVmcz4KCQk8cGF0aCBpZD0iYSIgZD0iTTAgMGgyNHYyNEgweiIvPgoJPC9kZWZzPgoJPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTEgLTEpIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgoJCTxtYXNrIGlkPSJiIiBmaWxsPSIjZmZmIj48dXNlIHhsaW5rOmhyZWY9IiNhIi8+PC9tYXNrPgoJCTxwYXRoIGQ9Ik02IDIyLjY2N0E0LjY2NyA0LjY2NyAwIDAgMCAxMC42NjcgMThjMC0xLjIyNy0uNTU5LTIuNS0xLjMzNC0zLjMzM0M4LjQ4MSAxMy43NSA3LjM1IDEzLjMzMyA2IDEzLjMzM2MtLjQxMSAwIDEuMzMzLTYuNjY2IDMtOSAxLjY2Ny0yLjMzMyAxLjMzMy0zIC4zMzMtM0M4IDEuMzMzIDUuMjUzIDQuNTg2IDQgNy4yNTUgMS43NzMgMTIgMS4zMzMgMTUuMzkyIDEuMzMzIDE4QTQuNjY3IDQuNjY3IDAgMCAwIDYgMjIuNjY3em0xMiAwQTQuNjY3IDQuNjY3IDAgMCAwIDIyLjY2NyAxOGMwLTEuMjI3LS41NTktMi41LTEuMzM0LTMuMzMzLS44NTItLjkxNy0xLjk4My0xLjMzNC0zLjMzMy0xLjMzNC0uNDExIDAgMS4zMzMtNi42NjYgMy05IDEuNjY3LTIuMzMzIDEuMzMzLTMgLjMzMy0zLTEuMzMzIDAtNC4wOCAzLjI1My01LjMzMyA1LjkyMkMxMy43NzMgMTIgMTMuMzMzIDE1LjM5MiAxMy4zMzMgMThBNC42NjcgNC42NjcgMCAwIDAgMTggMjIuNjY3eiIgZmlsbD0iI0QzRDlFMyIgbWFzaz0idXJsKCNiKSIvPgoJPC9nPgo8L3N2Zz4=");
+			inset-block-start: 0;
+			inset-inline-start: 0;
+			position: absolute;
+			transform: var(--d2l-mirror-transform, none); /* stylelint-disable-line @stylistic/string-quotes, @stylistic/function-whitespace-after */
+		}
+		@media (max-width: 615px) {
+			.d2l-typography .d2l-blockquote {
+				line-height: 1.2rem;
+			}
+		}
+	
+	</style></head>
+<body style="overflow-y: hidden;">
+
+<header id="title-block-header">
+CP411-A2 2D Graphics, Simple Draw
+</header>
+
+<main>
+<section>
+<article>
+<section>
+<article>
+<p><strong>Objectives</strong></p>
+<ul class="incremental">
+<li>Concepts of graphics pipeline</li>
+<li>OpenGL and GLUT</li>
+<li>Data structures for 2D graphics objects</li>
+<li>Scan conversion algorithms</li>
+<li>Graphics file formats bitmap, SVG</li>
+<li>Interactive graphics</li>
+</ul>
+<p><strong>Preparations</strong></p>
+<ul class="incremental">
+<li>It is recommended to use work directory <code>C:/cp411/assignments/a2</code> for program projects and submission files of a2, and <code>C:/cp411/assignments/a2/images</code> directory to store images of a2. We will use these directories in the following task specifications.</li>
+<li>Download <a href="https://mylearningspace.wlu.ca/content/enforced/598113-587.202509/release/assignments/a2/readme.txt?ou=598113">readme.txt</a> and <a href="https://mylearningspace.wlu.ca/content/enforced/598113-587.202509/release/assignments/a2/a2_report.md?ou=598113">a2_report.md</a> (right click the hypertext &gt; Save link as) and save them to folder <code>C:/cp411/assignments/a2</code>.</li>
+<li>Read the readme.txt file to see the mark distribution of the graded tasks. Check the a2_report.md file for the template of a2 report. Be prepared to take screen shot for each graded item.</li>
+<li>Check the submission section at end of this document to see the submission requirements.</li>
+</ul>
+<h2 id="graphics-pipeline-description">Graphics pipeline (Description)</h2>
+<p>Use your own words to answer briefly the following questions. Write your answer in the assignment report.</p>
+<h3 id="graphics-primitives">Graphics primitives</h3>
+<p>What are graphic primitives, and their relations to graphics objects?</p>
+<h3 id="graphics-pipeline-operations">Graphics pipeline operations</h3>
+<p>What are the major operations/computings in graphic pipeles?</p>
+<h3 id="coordinate-systems-transformations">Coordinate systems &amp; transformations</h3>
+<p>What coordinate systems and transformations are involved in graphics pipeline?</p>
+<h3 id="scan-conversion">Scan conversion</h3>
+<p>What does a scan conversion algorithm do?</p>
+<!--
+### Hand-on Bresenham algorithm 
+
+Apply Bresenham algorithm to determine the pixel positions of line segment from (1, 2) to (7, 6). 
+-->
+<h3 id="hand-on-midpoint-algorithm">Hand-on Midpoint algorithm</h3>
+<p>Apply Midpoint algorithm to determine the pixel positions (0&lt;=x&lt;=y) of circle centered at (0, 0) and radius 10.</p>
+<p>Write you answer on paper, write your name on the paper, take a picture and save it in the image folder, and add link in report.</p>
+<h2 id="opengl-and-glut-lab-practice">OpenGL and Glut (Lab practice)</h2>
+<p>Create a folder lab under the a2 folder.</p>
+<h3 id="opengl-primitives">OpenGL primitives</h3>
+<ol class="incremental" type="1">
+<li>Download <a href="https://mylearningspace.wlu.ca/content/enforced/598113-587.202509/release/assignments/a2/lab/opengl_primitives.c?ou=598113">opengl_primitives.c</a>, and save to the lab folder.</li>
+<li>Open a cmd console, cd to the lab directory, compile and run the program to see what it displays as follows.</li>
+</ol>
+<pre><code>gcc opengl_primitives.c -lfreeglut -lopengl32 -lglu32</code></pre>
+<p>or compile using C++ compiler g++ as follows.</p>
+<pre><code>g++ opengl_primitives.c -lfreeglut -lopengl32 -lglu32</code></pre>
+<p>The compiling generates executable a.exe, run it by typing a.exe in the console.</p>
+<p>For the convenience of programming, you can use Eclipse to test the program. Drag the <code>opengl_primitives.c</code> program (as link) to the src folder of <code>openglc</code> project in Eclipse of A1, deleting the existing openglc.c program. Compile and run.</p>
+<ol class="incremental" start="3" type="1">
+<li>Read and understand how to</li>
+</ol>
+<ul class="incremental">
+<li>Set up display window by Glut APIs.</li>
+<li>Initialize the drawing by setting the background color by glClearColor, setting transformation matrix by glMatrix, setting orthogonal projection and view port by gluOrtho2D. Note that <code>gluOrtho2D(0.0, 200.0, 0.0, 150.0);</code> set the origin of viewing region at the bottom left corner of the display window.<br>
+</li>
+<li>Draw primitives, pixel, line segment, polygon, and characters on the display window.</li>
+</ul>
+<ol class="incremental" start="4" type="1">
+<li>Change line <code>gluOrtho2D(0.0, 200.0, 0.0, 150.0);</code> to <code>gluOrtho2D(0.0, 200.0, 150.0, 0);</code>, and see that the origin of viewing region at the top left corner of the display window.</li>
+<li>lingSegment() function uses OpenGL’s conversion algorithm to draw the line segment. Add the following Bresenham line segment function, and change lineSegment(185, 15, 10, 145) to Bresenham(185, 15, 10, 145).</li>
+</ol>
+<div class="sourceCode" id="Bresenham"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="Bresenham-1" title="1"><span class="dt">void</span> Bresenham(<span class="dt">int</span> x1, <span class="dt">int</span> y1, <span class="dt">int</span> x2, <span class="dt">int</span> y2) {</a>
+<a class="sourceLine" id="Bresenham-2" title="2">    <span class="dt">int</span> Dx, Dy, x, y, s, p, c1, c2;</a>
+<a class="sourceLine" id="Bresenham-3" title="3">    <span class="cf">if</span> (x1 &gt; x2) {</a>
+<a class="sourceLine" id="Bresenham-4" title="4">        x = x2;</a>
+<a class="sourceLine" id="Bresenham-5" title="5">        y = y2;</a>
+<a class="sourceLine" id="Bresenham-6" title="6">        x2 = x1;</a>
+<a class="sourceLine" id="Bresenham-7" title="7">        y2 = y1;</a>
+<a class="sourceLine" id="Bresenham-8" title="8">        x1 = x;</a>
+<a class="sourceLine" id="Bresenham-9" title="9">        y1 = y;</a>
+<a class="sourceLine" id="Bresenham-10" title="10">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="Bresenham-11" title="11">        x = x1;</a>
+<a class="sourceLine" id="Bresenham-12" title="12">        y = y1;</a>
+<a class="sourceLine" id="Bresenham-13" title="13">    }</a>
+<a class="sourceLine" id="Bresenham-14" title="14"></a>
+<a class="sourceLine" id="Bresenham-15" title="15">    Dx = x2 - x1;</a>
+<a class="sourceLine" id="Bresenham-16" title="16"></a>
+<a class="sourceLine" id="Bresenham-17" title="17">    <span class="cf">if</span> (y1 &gt; y2) {</a>
+<a class="sourceLine" id="Bresenham-18" title="18">        Dy = y1 - y2;</a>
+<a class="sourceLine" id="Bresenham-19" title="19">        s = -<span class="dv">1</span>;</a>
+<a class="sourceLine" id="Bresenham-20" title="20">        y2 = <span class="dv">2</span> * y1 - y2;</a>
+<a class="sourceLine" id="Bresenham-21" title="21"></a>
+<a class="sourceLine" id="Bresenham-22" title="22">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="Bresenham-23" title="23">        Dy = y2 - y1;</a>
+<a class="sourceLine" id="Bresenham-24" title="24">        s = <span class="dv">1</span>;</a>
+<a class="sourceLine" id="Bresenham-25" title="25">    }</a>
+<a class="sourceLine" id="Bresenham-26" title="26"></a>
+<a class="sourceLine" id="Bresenham-27" title="27">    setPixel(x, y);</a>
+<a class="sourceLine" id="Bresenham-28" title="28"></a>
+<a class="sourceLine" id="Bresenham-29" title="29">    <span class="cf">if</span> (Dy &lt;= Dx) {</a>
+<a class="sourceLine" id="Bresenham-30" title="30">        p = <span class="dv">2</span> * Dy - Dx;</a>
+<a class="sourceLine" id="Bresenham-31" title="31">        c1 = <span class="dv">2</span> * Dy;</a>
+<a class="sourceLine" id="Bresenham-32" title="32">        c2 = <span class="dv">2</span> * (Dy - Dx);</a>
+<a class="sourceLine" id="Bresenham-33" title="33"></a>
+<a class="sourceLine" id="Bresenham-34" title="34">        <span class="cf">while</span> (x &lt; x2) {</a>
+<a class="sourceLine" id="Bresenham-35" title="35"></a>
+<a class="sourceLine" id="Bresenham-36" title="36">            x = x + <span class="dv">1</span>;</a>
+<a class="sourceLine" id="Bresenham-37" title="37">            <span class="cf">if</span> (p &lt; <span class="dv">0</span>)</a>
+<a class="sourceLine" id="Bresenham-38" title="38">                p = p + c1;</a>
+<a class="sourceLine" id="Bresenham-39" title="39">            <span class="cf">else</span> {</a>
+<a class="sourceLine" id="Bresenham-40" title="40">                y = y + <span class="dv">1</span>;</a>
+<a class="sourceLine" id="Bresenham-41" title="41">                p = p + c2;</a>
+<a class="sourceLine" id="Bresenham-42" title="42">            }</a>
+<a class="sourceLine" id="Bresenham-43" title="43">            <span class="cf">if</span> (s == <span class="dv">1</span>)</a>
+<a class="sourceLine" id="Bresenham-44" title="44">                setPixel(x, y);</a>
+<a class="sourceLine" id="Bresenham-45" title="45">            <span class="cf">else</span></a>
+<a class="sourceLine" id="Bresenham-46" title="46">                setPixel(x, y1 + y1 - y);</a>
+<a class="sourceLine" id="Bresenham-47" title="47">        }</a>
+<a class="sourceLine" id="Bresenham-48" title="48">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="Bresenham-49" title="49">        p = <span class="dv">2</span> * Dx - Dy;</a>
+<a class="sourceLine" id="Bresenham-50" title="50">        c1 = <span class="dv">2</span> * Dx;</a>
+<a class="sourceLine" id="Bresenham-51" title="51">        c2 = <span class="dv">2</span> * (Dx - Dy);</a>
+<a class="sourceLine" id="Bresenham-52" title="52"></a>
+<a class="sourceLine" id="Bresenham-53" title="53">        <span class="cf">while</span> (y &lt; y2) {</a>
+<a class="sourceLine" id="Bresenham-54" title="54">            y = y + <span class="dv">1</span>;</a>
+<a class="sourceLine" id="Bresenham-55" title="55">            <span class="cf">if</span> (p &lt; <span class="dv">0</span>)</a>
+<a class="sourceLine" id="Bresenham-56" title="56">                p = p + c1;</a>
+<a class="sourceLine" id="Bresenham-57" title="57">            <span class="cf">else</span> {</a>
+<a class="sourceLine" id="Bresenham-58" title="58">                x = x + <span class="dv">1</span>;</a>
+<a class="sourceLine" id="Bresenham-59" title="59">                p = p + c2;</a>
+<a class="sourceLine" id="Bresenham-60" title="60">            }</a>
+<a class="sourceLine" id="Bresenham-61" title="61">            <span class="cf">if</span> (s == <span class="dv">1</span>)</a>
+<a class="sourceLine" id="Bresenham-62" title="62">                setPixel(x, y);</a>
+<a class="sourceLine" id="Bresenham-63" title="63">            <span class="cf">else</span></a>
+<a class="sourceLine" id="Bresenham-64" title="64">                setPixel(x, y1 + y1 - y);</a>
+<a class="sourceLine" id="Bresenham-65" title="65">        }</a>
+<a class="sourceLine" id="Bresenham-66" title="66">    }</a>
+<a class="sourceLine" id="Bresenham-67" title="67">}</a></code></pre></div>
+<p>Compile and run the program to see the result. <b>Take a screen shot to verify that it works.</b></p>
+<h3 id="interactive-graphics">Interactive graphics</h3>
+<p>As we know, mouse and keyboard are the common input devices to interact with a GUI program. The mechanism of interactions is that a mouse/keyboard action generates an event, which is captured by the program, then an event handler (also called event routine) is called to run.</p>
+<p>Glut provides APIs to register event routines to input devices. We write event routines, functions, to define what to do when the event happens. Event can be mouse actions of left click, right click, and dragging, as well as key stroke of keyboard.</p>
+<p>The programs in the following are C++ programs, it needs to use C++ compiler g++ to compile. If you want to use Eclipse to compile and run, drag it to A1’s MyOpenGL in Eclipse.</p>
+<ol class="incremental" type="1">
+<li>Interact graphics program by menu.</li>
+</ol>
+<ul class="incremental">
+<li>Download <a href="https://mylearningspace.wlu.ca/content/enforced/598113-587.202509/release/assignments/a2/lab/opengl_menu.cpp?ou=598113">opengl_menu.cpp</a> to the lab folder, compile and run the program using g++ compiler. You can also drag it to MyOpenGL of A1 to compile and run within Eclipse.</li>
+<li>Right click to pop up a menu, and move mouse pointer to navigate the menu, and clicking left mouse key to select.</li>
+<li>Read the program and understand how to create menu, register functions to mouse right click event Glut APIs.</li>
+</ul>
+<ol class="incremental" start="2" type="1">
+<li>Draw sequence of points by mouse click.</li>
+</ol>
+<ul class="incremental">
+<li>Download <a href="https://mylearningspace.wlu.ca/content/enforced/598113-587.202509/release/assignments/a2/lab/opengl_points.cpp?ou=598113">opengl_points.cpp</a> to the lab folder, compile and run the program.</li>
+<li>Clicking left mouse key to draw a point at the mouse position, as well as the list points.</li>
+<li>Read the program to see how to get the coordinates of mouse position, how to store points in a data structure.</li>
+<li>Try different primitive names in drawPoints() function, e.g.&nbsp;GL_LINE_STRIP. <b>Take a screen shot to verify that it works.</b></li>
+</ul>
+<ol class="incremental" start="3" type="1">
+<li>Interact graphics with keyboard action.</li>
+</ol>
+<ul class="incremental">
+<li>Download <a href="https://mylearningspace.wlu.ca/content/enforced/598113-587.202509/release/assignments/a2/lab/opengl_key.cpp?ou=598113">opengl_key.cpp</a> to the lab folder, compile and run the program.</li>
+<li>Press letter c and mouse right click to drawing of dots at click positions.</li>
+<li>Read the program and understand how to register a function to keyboard event.</li>
+</ul>
+<ol class="incremental" start="4" type="1">
+<li>Interact with objects in graphics.</li>
+</ol>
+<ul class="incremental">
+<li>Download <a href="https://mylearningspace.wlu.ca/content/enforced/598113-587.202509/release/assignments/a2/lab/opengl_pick.cpp?ou=598113">opengl_pick.cpp</a>, compile and run the program.</li>
+<li>Right click the rectangles of different colors and see the console output.</li>
+<li>Read the program and understand how to find the object at a clicking position.</li>
+</ul>
+<h3 id="bitmap-file-io">Bitmap file I/O</h3>
+<p>This task is to read image data from frame buffer and write into file in bitmap format, so that it can be opened by other viewer program supporting bitmap. On the other hand, it reads a bitmap file and write the image data to frame buffer to display on windows.</p>
+<ul class="incremental">
+<li>Download <a href="https://mylearningspace.wlu.ca/content/enforced/598113-587.202509/release/assignments/a2/lab/opengl_bitmap.cpp?ou=598113">opengl_bitmap.cpp</a> to lab folder, compile and run the program.</li>
+<li>Right click the display area to bring up the menu, select <code>Save bitmap</code> to save the image to file output.bmp. Open output.bmp in browser to see the image. Next select <code>Load from output.bmp</code> from the dropdown menu, to load the output.bmp and display it in the program.</li>
+<li>Read the program and understand how to read pixel data from frame buffer, to write to bitmap file, and to load bitmap file.</li>
+</ul>
+<!--
+### SVG file I/O
+
+This task is to save vector graphic object to SVG file, an XML document for vector images, load and manipulate XML DOM to edit the SVG document. It uses the third party C++ XML library tinyxml.   
+
+- Download [tinyxml_svg.zip](lab/tinyxml_svg.zip) to the lab folder. Import it into Eclipse, build, and run. It generates two svg files, output.svg and output1.svg.   
+- Open output.svg and output1.svg in a browser to see the graphics in the browser. Open output.svg and output1.svg in a text editor to see svg format and elements in the xml document. 
+- Read the main program xmlsvg.cpp, and understand how to create a xml svg string, parse it to XML DOM object, save to file, load xml document from file to DOM object, and add and modify the object.  
+-->
+<h2 id="simpledraw-programming">SimpleDraw (Programming)</h2>
+<p>Design and implement a C++ OpenGL program called <em>SimpleDraw</em>, an interactive 2D graphics program that allows users to draw rectangles and circles of different colors.&nbsp;</p>
+<ul class="incremental">
+<li>A right click pop-up menu is used to select operations.</li>
+<li>Shape objects can be drawed, re-positioned, re-ordered, and deleted.</li>
+<li>The drawing can be saved as&nbsp;Scalable Vector Graphics (SVG) file. The saved SVG file can loaded into the program for editing or adding objects.</li>
+<li>The drawing can also be exported to bitmap format as an artwork.</li>
+</ul>
+<p>The detailed specifications are as follows.</p>
+<h3 id="display-window-and-menu">Display window and menu</h3>
+<ol class="incremental" type="1">
+<li>Initial window properties: window size: 800x600, title: SimpleDraw (Your name), background color: white.</li>
+<li>Right clicking pops up a menu of the following menu operations or submenus.</li>
+</ol>
+<ul class="incremental">
+<li>New : It cleans up every thing and sets to the initial status.</li>
+<li>Draw : It contains submenus of Rectangle and Circle. The Rectangle enables drawing rectangles. The Circle enables drawing circles.<br>
+</li>
+<li>Style : It contains submenus of <code>Fill Color, Stroke Color</code>, and `<code>Stroke Width</code>. The <code>Fill Color</code> has submenus of <code>red, green, blue, black, white</code>, and more colors of your choice. The <code>Stroke Color</code> has submenus of <code>red, green, blue, black, white</code>, and more colors of your choice. The <code>Stroke Width</code> has submenus of 1 to 5 values to specify the width of outline.</li>
+<li>Edit : It has submenus of <code>Select, Delete, Move front, Move back, Move around</code>.</li>
+<li>File : Contains submenus of <code>Save SVG, Open SVG</code>, and <code>Export Bitmap</code>.</li>
+<li>Quit : It exits the program.</li>
+</ul>
+<h3 id="data-structures">Data structures</h3>
+<ol class="incremental" type="1">
+<li>Design and implement a unified data structure to represent drawing objects, rectangles and circles with style attributes, fill color, stroke color and stroke-width of shape outline.<br>
+</li>
+<li>Design and implement a double linked list to hold a list of objects, together with data structure operation functions to support the SimpleDraw operations.</li>
+</ol>
+<h3 id="draw-rectangle">Draw rectangle</h3>
+<ol class="incremental" type="1">
+<li>The program is initially set up for drawing rectangles in fill and stroke color red. User can change drawing style by the Style menu.</li>
+<li>The user presses and holds the left mouse button in the drawing area to determine a corner of the rectangle. The mouse is then moved to an opposite corner of the rectangle. Releasing the left mouse button draws the rectangle. When moving the mouse, an outline of a rectangle at the mouse position is showing (the robber band effect). Make sure that you are able to draw a rectangle in all directions from the initial point (i.e., not just to the bottom right corner).</li>
+</ol>
+<h3 id="draw-circle">Draw circle</h3>
+<ol class="incremental" type="1">
+<li>Similar to drawing rectangles, a user presses the left mouse button&nbsp;to determine the center of the circle. Holding the left button and&nbsp;moving the mouse, an outline of the circle passing the mouse position is showing.&nbsp;Releasing the left mouse button gets a&nbsp;point on the circle. User can change drawing style by the Style menu.</li>
+<li><b>It is required to use the Midpoint algorithm to draw circles</b>.</li>
+</ol>
+<h3 id="edit-features">Edit features</h3>
+<ol class="incremental" type="1">
+<li>Select: Use Edit -&gt; Select to get into selection mode.&nbsp;Under this mode, when left mouse button is clicked, the program determines which object, if any, is underneath the mouse pointer. If there is more than one object under the mouse pointer, the program will select the top object. When an object is selected, it is high-lighted by a yellow outline. Deselect can be done by left clicking an empty point.</li>
+<li>Delete: When an object is selected, use Edit -&gt; Delete to delete the selected object.</li>
+<li>Move front is to move the selected object to the top of objects. Move back is to move the selected object to the bottom of objects.</li>
+<li>Move around : click and hold left mouse on object to be moved, drag the object to a new position position, and release the mouse key.</li>
+</ol>
+<h3 id="saveopen-svg-files">Save/open SVG files</h3>
+<ol class="incremental" type="1">
+<li>Use menu <strong>File-&gt;Save SVG</strong> to save all the objects to SVG file of name: output.svg</li>
+<li>Use menu <strong>File-&gt;Open SVG </strong> to open the SVG file to open the output.svg file and import the object list.</li>
+</ol>
+<h3 id="export-to-bitmap-file">Export to bitmap file</h3>
+<p>Use menu <strong>File-&gt;Save Bitmap</strong> to save the graphics image to bitmap file named output.bmp, which can be viewed by any bmp viewer, e.g., browser.</p>
+<h3 id="circle-square-artwork">Circle &amp; Square artwork</h3>
+<p>Use your SimpleDraw program to create an artwork consisting of circles and rectangles. Save your artwork in SVG and bitmap files, and rename them as c&amp;s.svg, c&amp;s.bmp.</p>
+<h3 id="program-design">Program design</h3>
+<p>Create project directory SimpleDraw under the al directory, and src directory under SimpleDraw. Put all source code files of the project under src. This can be done using Eclipse. For better management of the complexity, it is required to split the program into several files as follows.</p>
+<ol class="incremental" type="1">
+<li>object.hpp and object.cpp is for the object data structure and double linked list data structures.</li>
+<li>edit.hpp and edit.cpp contains all functions and implementations for the edit operations.</li>
+<li>menu.hpp and menu.cpp contains menu functions.</li>
+<li>file.hpp and file.cpp contains file operation functions.</li>
+<li>simpledraw.cpp is the main function OpenGL program containing global variables, and mouse action functions.</li>
+</ol>
+<p>The program can be compiled by command:</p>
+<pre><code>g++ -o simpledraw.exe edit.cpp file.cpp menu.cpp object.cpp simpledraw.cpp -lfreeglut -lopengl32 -lglu32</code></pre>
+<p>Alternatively, you can use makefile to compile and run the program. It should run like the simpledraw.exe this <a href="https://mylearningspace.wlu.ca/content/enforced/598113-587.202509/release/assignments/a2/sample.zip?ou=598113">sample simpledraw program</a>.</p>
+<p>You can refer to this <a href="https://mylearningspace.wlu.ca/content/enforced/598113-587.202509/release/assignments/a2/simpledraw_reference_design.zip?ou=598113">simpledraw reference design</a> to design and implement your SimpleDraw program.</p>
+<p><strong>Submission</strong> <a name="submission"></a></p>
+<ol class="incremental" type="1">
+<li>Sign the <a href="https://mylearningspace.wlu.ca/content/enforced/598113-587.202509/release/assignments/a2/readme.txt?ou=598113"><code>readme.txt</code></a> file by filling in your Name, ID, and do the self-evaluation for each grading item.</li>
+<li>Write lab report by adding necessary information to the <code>a2_report.md</code>. Then convert <code>a2_report.md</code> to <code>a2_report.html</code> by command:<br><code>pandoc -i a2_report.md -o a2_report.html</code><br> Make sure that <code>a2_report.html</code> shows the screenshot images.<br>
+</li>
+<li>Select required folders and files in a2 folder to create a zip file, and rename it to <code>a2.zip</code>. The zip file should contain the following files and folders.</li>
+</ol>
+<pre>readme.txt
+a2_report.md
+a2_report.html
+images (folder)
+SimpleDraw (project folder)
+ 
+</pre>
+<ol class="incremental" start="4" type="1">
+<li>Submit the <code>a2.zip</code> to a2 dropbox on MyLS.</li>
+</ol>
+<p>Note: to minimize submission package size, clean projects before adding it to the submission package, delete all compiled .exe and .o files.</p>
+<p>You can use the following command to package the required files and folders into a zip file</p>
+<p><code>7z a -tzip a2.zip readme.txt a2_report.md a2_report.html images SimpleDraw</code></p>
+<p><strong>End</strong></p>
+</article>
+</section>
+</article>
+</section>
+</main>
+
+<footer>
+<p>
+© HBF CP411-A2 (update time:2025-09-16 17:06:55)
+</p>
+</footer>
+
+
+</body></html>

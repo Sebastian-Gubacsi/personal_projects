@@ -1,0 +1,500 @@
+#include <GL/glut.h>
+#include <string>
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include <cmath>
+
+bool moveMode = false;
+
+// Window properties
+int winWidth = 800, winHeight = 600;
+std::string winTitle = "SimpleDraw (Your Name)";
+
+// Drawing state
+enum Shape { NONE, RECTANGLE, CIRCLE };
+Shape currentShape = NONE;
+
+struct Style {
+    float fillColor[3]   = {0, 0, 0}; // black
+    float strokeColor[3] = {0, 0, 0}; // black
+    int strokeWidth      = 1;
+} style;
+
+struct Drawable {
+    Shape type;
+    float x, y, w, h;
+    Style style;
+    Drawable* next = nullptr;  // pointer to next object
+};
+
+// Head pointer for the linked list
+Drawable* head = nullptr;
+std::vector<Drawable> objects; // using vector for simplicity
+
+// --- New Global Variables ---
+int selectedIndex = -1;     // -1 means nothing selected
+bool dragging = false;      // for "Move Around"
+int dragOffsetX, dragOffsetY;
+
+// --------------------- Select Shape ------------------------
+int findShapeAt(int x, int y) {
+    int idx = 0, found = -1;
+    Drawable* curr = head;
+    while (curr) {
+        if (curr->type == RECTANGLE) {
+            if (x >= curr->x && x <= curr->x + curr->w &&
+                y >= curr->y && y <= curr->y + curr->h)
+                found = idx;
+        } else if (curr->type == CIRCLE) {
+            float dx = x - curr->x, dy = y - curr->y;
+            if (dx*dx + dy*dy <= curr->w * curr->w) found = idx;
+        }
+        curr = curr->next;
+        idx++;
+    }
+    return found;
+}
+
+
+// --------------------- Utility Functions ------------------------
+void setColor(float r, float g, float b) {
+    glColor3f(r, g, b);
+}
+
+void resetCanvas() {
+    objects.clear();
+    style = Style();
+    currentShape = NONE;
+    glutPostRedisplay();
+}
+
+// --------------------- Drawing ------------------------
+void drawRectangle(Drawable &obj) {
+    // Fill
+    glColor3fv(obj.style.fillColor);
+    glBegin(GL_QUADS);
+        glVertex2f(obj.x, obj.y);
+        glVertex2f(obj.x + obj.w, obj.y);
+        glVertex2f(obj.x + obj.w, obj.y + obj.h);
+        glVertex2f(obj.x, obj.y + obj.h);
+    glEnd();
+
+    // Stroke
+    glLineWidth(obj.style.strokeWidth);
+    glColor3fv(obj.style.strokeColor);
+    glBegin(GL_LINE_LOOP);
+        glVertex2f(obj.x, obj.y);
+        glVertex2f(obj.x + obj.w, obj.y);
+        glVertex2f(obj.x + obj.w, obj.y + obj.h);
+        glVertex2f(obj.x, obj.y + obj.h);
+    glEnd();
+}
+
+void drawCircle(Drawable &obj) {
+    float radius = obj.w;
+    int segments = 100;
+
+    // Fill
+    glColor3fv(obj.style.fillColor);
+    glBegin(GL_POLYGON);
+    for (int i = 0; i < segments; i++) {
+        float theta = 2.0f * 3.14159f * float(i) / float(segments);
+        float dx = radius * cosf(theta);
+        float dy = radius * sinf(theta);
+        glVertex2f(obj.x + dx, obj.y + dy);
+    }
+    glEnd();
+
+    // Stroke
+    glLineWidth(obj.style.strokeWidth);
+    glColor3fv(obj.style.strokeColor);
+    glBegin(GL_LINE_LOOP);
+    for (int i = 0; i < segments; i++) {
+        float theta = 2.0f * 3.14159f * float(i) / float(segments);
+        float dx = radius * cosf(theta);
+        float dy = radius * sinf(theta);
+        glVertex2f(obj.x + dx, obj.y + dy);
+    }
+    glEnd();
+}
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    Drawable* curr = head;
+    while (curr) {
+        if (curr->type == RECTANGLE) drawRectangle(*curr);
+        else if (curr->type == CIRCLE) drawCircle(*curr);
+        curr = curr->next;
+    }
+
+    // Highlight selected object
+    if (selectedIndex != -1) {
+        Drawable* sel = head;
+        int idx = 0;
+        while (sel && idx < selectedIndex) {
+            sel = sel->next;
+            idx++;
+        }
+        if (sel) {
+            glColor3f(1, 0, 0);
+            glLineWidth(2);
+            glBegin(GL_LINE_LOOP);
+            if (sel->type == RECTANGLE) {
+                glVertex2f(sel->x, sel->y);
+                glVertex2f(sel->x + sel->w, sel->y);
+                glVertex2f(sel->x + sel->w, sel->y + sel->h);
+                glVertex2f(sel->x, sel->y + sel->h);
+            } else if (sel->type == CIRCLE) {
+                int segs = 40;
+                for (int i = 0; i < segs; i++) {
+                    float theta = 2.0f * 3.14159f * i / segs;
+                    float dx = sel->w * cosf(theta);
+                    float dy = sel->w * sinf(theta);
+                    glVertex2f(sel->x + dx, sel->y + dy);
+                }
+            }
+            glEnd();
+        }
+    }
+
+    glutSwapBuffers();
+}
+
+// --------------------- Menu Functions ------------------------
+void menuNew(int) {
+    resetCanvas();
+}
+
+void menuDraw(int option) {
+    if (option == 1) currentShape = RECTANGLE;
+    else if (option == 2) currentShape = CIRCLE;
+}
+
+void menuFillColor(int option) {
+    switch(option) {
+        case 1: style.fillColor[0]=1; style.fillColor[1]=0; style.fillColor[2]=0; break; // Red
+        case 2: style.fillColor[0]=0; style.fillColor[1]=1; style.fillColor[2]=0; break; // Green
+        case 3: style.fillColor[0]=0; style.fillColor[1]=0; style.fillColor[2]=1; break; // Blue
+        case 4: style.fillColor[0]=0; style.fillColor[1]=0; style.fillColor[2]=0; break; // Black
+        case 5: style.fillColor[0]=1; style.fillColor[1]=1; style.fillColor[2]=1; break; // White
+    }
+}
+
+void menuStrokeColor(int option) {
+    switch(option) {
+        case 1: style.strokeColor[0]=1; style.strokeColor[1]=0; style.strokeColor[2]=0; break;
+        case 2: style.strokeColor[0]=0; style.strokeColor[1]=1; style.strokeColor[2]=0; break;
+        case 3: style.strokeColor[0]=0; style.strokeColor[1]=0; style.strokeColor[2]=1; break;
+        case 4: style.strokeColor[0]=0; style.strokeColor[1]=0; style.strokeColor[2]=0; break;
+        case 5: style.strokeColor[0]=1; style.strokeColor[1]=1; style.strokeColor[2]=1; break;
+    }
+}
+
+void menuStrokeWidth(int option) {
+    style.strokeWidth = option;
+}
+void saveSVG(const std::string& filename) {
+    std::ofstream out(filename);
+    if (!out) return;
+
+    out << "<svg xmlns='http://www.w3.org/2000/svg' width='" << winWidth
+        << "' height='" << winHeight << "'>\n";
+
+    for (auto &obj : objects) {
+        char fill[32], stroke[32];
+        sprintf(fill, "rgb(%d,%d,%d)",
+                int(obj.style.fillColor[0] * 255),
+                int(obj.style.fillColor[1] * 255),
+                int(obj.style.fillColor[2] * 255));
+        sprintf(stroke, "rgb(%d,%d,%d)",
+                int(obj.style.strokeColor[0] * 255),
+                int(obj.style.strokeColor[1] * 255),
+                int(obj.style.strokeColor[2] * 255));
+
+        if (obj.type == RECTANGLE) {
+            out << "<rect x='" << obj.x << "' y='" << (winHeight - obj.y - obj.h)
+                << "' width='" << obj.w << "' height='" << obj.h
+                << "' fill='" << fill
+                << "' stroke='" << stroke
+                << "' stroke-width='" << obj.style.strokeWidth << "' />\n";
+        } else if (obj.type == CIRCLE) {
+            out << "<circle cx='" << obj.x << "' cy='" << (winHeight - obj.y)
+                << "' r='" << obj.w
+                << "' fill='" << fill
+                << "' stroke='" << stroke
+                << "' stroke-width='" << obj.style.strokeWidth << "' />\n";
+        }
+    }
+
+    out << "</svg>\n";
+    std::cout << "Saved to " << filename << "\n";
+}
+
+void exportBitmap(const std::string& filename) {
+    std::vector<unsigned char> pixels(3 * winWidth * winHeight);
+    glReadPixels(0, 0, winWidth, winHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+
+    std::ofstream out(filename, std::ios::binary);
+    out << "P6\n" << winWidth << " " << winHeight << "\n255\n";
+    for (int y = winHeight - 1; y >= 0; y--) {
+        out.write((char*)&pixels[y * winWidth * 3], winWidth * 3);
+    }
+    std::cout << "Exported bitmap to " << filename << "\n";
+}
+
+void openSVG(const std::string& filename) {
+    std::ifstream in(filename);
+    if (!in) return;
+
+    objects.clear();
+    std::string line;
+    while (std::getline(in, line)) {
+        if (line.find("<rect") != std::string::npos) {
+            Drawable obj;
+            obj.type = RECTANGLE;
+            sscanf(line.c_str(),
+                   "<rect x='%f' y='%f' width='%f' height='%f'",
+                   &obj.x, &obj.y, &obj.w, &obj.h);
+            obj.y = winHeight - obj.y - obj.h; // flip Y back
+            objects.push_back(obj);
+        } else if (line.find("<circle") != std::string::npos) {
+            Drawable obj;
+            obj.type = CIRCLE;
+            sscanf(line.c_str(),
+                   "<circle cx='%f' cy='%f' r='%f'",
+                   &obj.x, &obj.y, &obj.w);
+            obj.y = winHeight - obj.y; // flip Y back
+            objects.push_back(obj);
+        }
+    }
+    glutPostRedisplay();
+    std::cout << "Opened from " << filename << "\n";
+}
+
+void menuFile(int option) {
+    switch(option) {
+        case 1: saveSVG("output.svg"); break;
+        case 2: openSVG("output.svg"); break;
+        case 3: exportBitmap("output.ppm"); break;
+    }
+}
+
+
+void menuQuit(int) {
+    exit(0);
+}
+
+// --------------------- Mouse Input ------------------------
+void mouse(int button, int state, int x, int y) {
+    int mx = x;
+    int my = winHeight - y;
+
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        if (currentShape != NONE) {
+            Drawable* obj = new Drawable();
+            obj->type = currentShape;
+            obj->x = mx;
+            obj->y = my;
+            obj->w = 50;
+            obj->h = 50;
+            obj->style = style;
+            obj->next = head;   // prepend to linked list
+            head = obj;
+            glutPostRedisplay();
+        } else if (moveMode) {
+            selectedIndex = findShapeAt(mx, my);
+            if (selectedIndex != -1) {
+                Drawable* sel = head;
+                for (int i = 0; i < selectedIndex; i++) sel = sel->next;
+                dragOffsetX = mx - sel->x;
+                dragOffsetY = my - sel->y;
+                dragging = true;
+            }
+        } else {
+            selectedIndex = findShapeAt(mx, my);
+            glutPostRedisplay();
+        }
+    }
+
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+        dragging = false;
+    }
+}
+
+void motion(int x, int y) {
+    if (dragging && selectedIndex != -1 && moveMode) {
+        Drawable* sel = head;
+        for (int i = 0; i < selectedIndex; i++) sel = sel->next;
+        if (sel) {
+            sel->x = x - dragOffsetX;
+            sel->y = winHeight - y - dragOffsetY;
+            glutPostRedisplay();
+        }
+    }
+}
+
+void deleteSelected() {
+    if (selectedIndex == -1) return;
+
+    Drawable* prev = nullptr;
+    Drawable* curr = head;
+    for (int i = 0; i < selectedIndex; i++) {
+        prev = curr;
+        curr = curr->next;
+    }
+
+    if (!prev) head = curr->next; // deleting head
+    else prev->next = curr->next;
+
+    delete curr;
+    selectedIndex = -1;
+    glutPostRedisplay();
+}
+
+void moveFront() {
+    if (selectedIndex == -1) return;
+
+    Drawable* prev = nullptr;
+    Drawable* curr = head;
+    for (int i = 0; i < selectedIndex; i++) {
+        prev = curr;
+        curr = curr->next;
+    }
+
+    if (!prev) {
+        // already head, move to back
+        head = curr->next;
+    } else {
+        prev->next = curr->next; // detach
+    }
+
+    // find tail
+    Drawable* tail = head;
+    if (tail) {
+        while (tail->next) tail = tail->next;
+        tail->next = curr;
+    } else {
+        head = curr; // list was empty
+    }
+    curr->next = nullptr;
+    selectedIndex = -1;
+    glutPostRedisplay();
+}
+
+void moveBack() {
+    if (selectedIndex == -1) return;
+
+    Drawable* prev = nullptr;
+    Drawable* curr = head;
+    for (int i = 0; i < selectedIndex; i++) {
+        prev = curr;
+        curr = curr->next;
+    }
+
+    if (prev) prev->next = curr->next; // detach from current position
+    curr->next = head;                  // move to front
+    head = curr;
+    selectedIndex = 0;
+    glutPostRedisplay();
+}
+
+void menuEdit(int option) {
+    switch(option) {
+        case 1: // Select
+            currentShape = NONE; 
+            moveMode = false;
+            break;
+        case 2: // Delete
+            deleteSelected();
+            break;
+        case 3: // Move Front
+            moveFront();
+            break;
+        case 4: // Move Back
+            moveBack();
+            break;
+        case 5: // Move Around
+            currentShape = NONE;   // disable drawing new shapes
+            moveMode = true;       // enable move mode
+            break;
+    }
+}
+
+// --------------------- Init ------------------------
+void initMenu() {
+    int drawMenu = glutCreateMenu(menuDraw);
+    glutAddMenuEntry("Rectangle", 1);
+    glutAddMenuEntry("Circle", 2);
+
+    int fillMenu = glutCreateMenu(menuFillColor);
+    glutAddMenuEntry("Red", 1);
+    glutAddMenuEntry("Green", 2);
+    glutAddMenuEntry("Blue", 3);
+    glutAddMenuEntry("Black", 4);
+    glutAddMenuEntry("White", 5);
+
+    int strokeMenu = glutCreateMenu(menuStrokeColor);
+    glutAddMenuEntry("Red", 1);
+    glutAddMenuEntry("Green", 2);
+    glutAddMenuEntry("Blue", 3);
+    glutAddMenuEntry("Black", 4);
+    glutAddMenuEntry("White", 5);
+
+    int strokeWidthMenu = glutCreateMenu(menuStrokeWidth);
+    for (int i=1; i<=5; i++) {
+        std::string s = "Width " + std::to_string(i);
+        glutAddMenuEntry(s.c_str(), i);
+    }
+
+    int styleMenu = glutCreateMenu(NULL);
+    glutAddSubMenu("Fill Color", fillMenu);
+    glutAddSubMenu("Stroke Color", strokeMenu);
+    glutAddSubMenu("Stroke Width", strokeWidthMenu);
+
+    int editMenu = glutCreateMenu(menuEdit);
+    glutAddMenuEntry("Select", 1);
+    glutAddMenuEntry("Delete", 2);
+    glutAddMenuEntry("Move Front", 3);
+    glutAddMenuEntry("Move Back", 4);
+    glutAddMenuEntry("Move Around", 5);
+
+    int fileMenu = glutCreateMenu(menuFile);
+    glutAddMenuEntry("Save SVG", 1);
+    glutAddMenuEntry("Open SVG", 2);
+    glutAddMenuEntry("Export Bitmap", 3);
+
+    glutCreateMenu(NULL);
+    glutAddMenuEntry("New", 1);
+    glutAddSubMenu("Draw", drawMenu);
+    glutAddSubMenu("Style", styleMenu);
+    glutAddSubMenu("Edit", editMenu);
+    glutAddSubMenu("File", fileMenu);
+    glutAddMenuEntry("Quit", 2);
+
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
+void initGL() {
+    glClearColor(1.0, 1.0, 1.0, 1.0); // white bg
+    glMatrixMode(GL_PROJECTION);
+    gluOrtho2D(0, winWidth, 0, winHeight);
+}
+
+// --------------------- Main ------------------------
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitWindowSize(winWidth, winHeight);
+    glutCreateWindow(winTitle.c_str());
+
+    initGL();
+    initMenu();
+
+    glutDisplayFunc(display);
+    glutMouseFunc(mouse);
+
+    glutMainLoop();
+    return 0;
+}   
