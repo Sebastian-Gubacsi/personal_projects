@@ -1,6 +1,7 @@
 /*
  * Author: Sebastian Gubacsi
  * Version: 2025-10-22
+ * Modified: Fixed to properly use component geometry
  */
 
 #include "House.hpp"
@@ -12,11 +13,6 @@ House::House()
 	
 	// Create pyramid for the roof
 	pyramid = new Pyramid();
-	
-	// Position pyramid on top of cube
-	// Cube is from -0.5 to 0.5 in z
-	// Move pyramid up by 1.0 so its base sits on top of cube
-	pyramid->translate(0, 0, 1.0);
 }
 
 House::~House()
@@ -33,24 +29,13 @@ void House::draw()
 	this->ctmMultiply();
 	glScalef(s, s, s);
 	
-	// Draw cube body
-	glColor3f(1.0, 0.0, 0.0); // Red for body
-	glPushMatrix();
-	// Cube draws at its own position (no additional transform needed)
-	for (int i = 0; i < 6; i++) {
-		cube->drawFace(i);
-	}
-	glPopMatrix();
+	// Draw cube body at origin
+	cube->drawGeometry();
 	
-	// Draw pyramid roof
-	glColor3f(1.0, 1.0, 0.0); // Yellow for roof
+	// Draw pyramid roof translated up by 1.0
 	glPushMatrix();
-	// Apply pyramid's translation (it's positioned 1.0 unit up)
 	glTranslatef(0, 0, 1.0);
-	for (int i = 0; i < 4; i++) {
-		pyramid->drawFace(i);
-	}
-	pyramid->drawBase();
+	pyramid->drawGeometry();
 	glPopMatrix();
 	
 	glPopMatrix();
