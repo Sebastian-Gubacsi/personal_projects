@@ -4,7 +4,7 @@ It behaves a lot like a layer itself, although
 we're not going make it one.
 """
 
-from typing import Sequence
+from typing import Sequence, Iterator, Tuple
 
 from deep_learning_library.layers import Layer
 from deep_learning_library.tensor import Tensor
@@ -22,3 +22,9 @@ class NeuralNet:
         for layer in reversed(self.layers):
             grad = layer.backward(grad)
         return grad
+    
+    def params_and_grads(self) -> Iterator[Tuple[Tensor, Tensor]]:
+        for layer in self.layers:
+            for name, param in layer.params().items():
+                grad = layer.grads[name]
+                yield param, grad
