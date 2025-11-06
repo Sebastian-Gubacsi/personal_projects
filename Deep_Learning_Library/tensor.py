@@ -1,1 +1,5 @@
-print("hi")
+"""
+a tenser is a n dimensional array
+"""
+
+from numpy import ndarray as Tensor
