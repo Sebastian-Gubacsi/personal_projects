@@ -28,6 +28,7 @@ class Camera {
 	void setProjectionMatrix();
 	void translate(GLfloat tx, GLfloat ty, GLfloat tz);  /* translate eye position  */
 	void rotate(GLfloat rx, GLfloat rz, GLfloat ry, GLfloat angle); /* rotate in WCS */
+	void lookAt(Point target);  /* Point camera at target position */
 };
 
 #endif

@@ -14,6 +14,11 @@
 
 using namespace std;
 
+// Global flat shading color (when shadingMode == 2)
+extern GLfloat flatColor[3];
+// Factor (0..1) multiplied into object colors when lighting is on to make them dimmer
+extern GLfloat colorDimFactor;
+
 /**
  * Shape
  * The common class that will be inherited by model object class

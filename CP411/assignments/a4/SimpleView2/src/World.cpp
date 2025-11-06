@@ -11,21 +11,21 @@
 using namespace std;
 
 World::World() {
-	/* Add Cube into the world object list */
-	Shape *obj = new Cube();
-	obj->setId(1);
+	/* Add House into the world object list (in the middle) */
+	Shape *obj = new House();
+	obj->setId(3);
 	objlist.push_back(obj);
 
-	/* Add Pyramid into the world object list */
+	/* Add Cube into the world object list (right of house) */
+	obj = new Cube();
+	obj->setId(1);
+	obj->translate(2.0, 0, 0);  // Position to the right of house
+	objlist.push_back(obj);
+
+	/* Add Pyramid into the world object list (right of cube) */
 	obj = new Pyramid();
 	obj->setId(2);
-	obj->translate(-2.5, 0, 0);  // Position to the left
-	objlist.push_back(obj);
-
-	/* Add House into the world object list */
-	obj = new House();
-	obj->setId(3);
-	obj->translate(2.5, 0, 0);  // Position to the right
+	obj->translate(3.5, 0, 0);  // Position to the right of cube
 	objlist.push_back(obj);
 }
 
@@ -63,8 +63,17 @@ void World::draw() {
 void World::reset(){
 	std::list<Shape*>::iterator it;
 	for (it = objlist.begin(); it !=  objlist.end(); ++it) {
-	  (*it)->reset();
-    }
+		(*it)->reset();  // First reset the object to clear all transformations
+	}
+
+	// Re-apply initial positions
+	Shape* house = searchById(3);
+	Shape* cube = searchById(1);
+	Shape* pyramid = searchById(2);
+
+	if (house) house->translate(0, 0, 0);     // House in middle
+	if (cube) cube->translate(2.0, 0, 0);     // Cube 2 units to right of house
+	if (pyramid) pyramid->translate(3.5, 0, 0); // Pyramid 3.5 units to right of house
 }
 
 Shape* World::searchById(GLint i) {

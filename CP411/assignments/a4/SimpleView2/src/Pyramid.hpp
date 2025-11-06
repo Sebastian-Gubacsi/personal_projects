@@ -21,6 +21,7 @@ protected:
 	GLfloat faceNormals[4][3]; /* Normal vectors for each face */
 	GLfloat baseColor[3];      /* Color for base */
 	GLfloat baseNormal[3];     /* Normal for base */
+	GLfloat objectColor[3];    /* Single solid color for flat shading */
 	GLfloat r, g, b;           /* legacy color pyramid */
 	
 	void computeFaceNormals();
@@ -34,6 +35,9 @@ public:
 	void draw();
 	void drawFace(int);
 	void drawBase();
+	void drawGeometry();  // Made public so House can use it
+	// Draw pyramid but average seam normals with a neighbor cube to smooth across the roof-body seam
+	void drawWithCubeSeamNormals(class Cube* neighbor);
 };
 
 #endif

@@ -46,6 +46,40 @@ void Camera::setViewNorm() {
 	viewNorm.set(x, y, z);
 }
 
+void Camera::lookAt(Point target) {
+	// Calculate distance from eye to current reference point
+	GLfloat dx = ref.x - eye.x;
+	GLfloat dy = ref.y - eye.y;
+	GLfloat dz = ref.z - eye.z;
+	GLfloat currentDist = sqrt(dx*dx + dy*dy + dz*dz);
+	
+	// Set reference point to target
+	ref.set(target);
+	
+	// Calculate direction from target to eye
+	GLfloat dirX = eye.x - target.x;
+	GLfloat dirY = eye.y - target.y;
+	GLfloat dirZ = eye.z - target.z;
+	GLfloat dist = sqrt(dirX*dirX + dirY*dirY + dirZ*dirZ);
+	
+	// If eye is too close or at the target, move it back
+	if (dist < 0.1) {
+		// Place eye at a good viewing distance from target
+		eye.x = target.x + 5.0;
+		eye.y = target.y + 5.0;
+		eye.z = target.z + 5.0;
+	} else {
+		// Maintain approximately the same viewing distance
+		GLfloat desiredDist = (currentDist > 3.0) ? currentDist : 8.0;
+		GLfloat scale = desiredDist / dist;
+		eye.x = target.x + dirX * scale;
+		eye.y = target.y + dirY * scale;
+		eye.z = target.z + dirZ * scale;
+	}
+	
+	setViewNorm();
+}
+
 void Camera::rotate(GLfloat rx, GLfloat ry, GLfloat rz, GLfloat angle){
 	// Rotate eye position around the reference point in WCS
 	// The axis of rotation passes through 'ref' with direction (rx, ry, rz)

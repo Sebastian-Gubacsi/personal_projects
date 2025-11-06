@@ -96,12 +96,14 @@ void menu() {
 	glutAddMenuEntry("Quit", 2);
 }
 
+// Declaration of resetAll function from SimpleView.cpp
+void resetAll(void);
+
 void mainMenu(GLint option) {
 	switch (option){
 		case 1:
-			myWorld.reset();
-			myCamera.reset();
-			animationMode = 0;
+			resetAll();  // Use the new resetAll function
+			printf("Reset: All settings restored to initial state\n");
 			break;
 		case 2:
 			exit(0);
@@ -113,7 +115,23 @@ void mainMenu(GLint option) {
 void ObjSubMenu(GLint objectOption)
 {
 	selectObj = myWorld.searchById(objectOption);
-	printf("Selected object: ID = %d\n", objectOption);
+	if (selectObj != NULL) {
+		printf("Selected object: ID = %d\n", objectOption);
+		
+		// Get object's position from its MC matrix
+		Point objectPos;
+		objectPos.x = selectObj->getMC().mat[0][3];
+		objectPos.y = selectObj->getMC().mat[1][3];
+		objectPos.z = selectObj->getMC().mat[2][3];
+		
+		// Move camera to look at the selected object
+		myCamera.lookAt(objectPos);
+		
+		printf("Camera moved to look at object at position (%.2f, %.2f, %.2f)\n", 
+		       objectPos.x, objectPos.y, objectPos.z);
+	} else {
+		printf("ERROR: Could not find object with ID = %d\n", objectOption);
+	}
 	glutPostRedisplay();
 }
 
@@ -226,18 +244,20 @@ void AnimationMenu(GLint option) {
 			glutTimerFunc(16, animationUpdate, 0);
 			break;
 		case 2:
-			// Reset objects for solar system
-			myWorld.reset();
-			Shape* house = myWorld.searchById(3);
-			Shape* cube = myWorld.searchById(1);
-			Shape* pyramid = myWorld.searchById(2);
-			if (house) house->translate(0, 0, 0);
-			if (cube) cube->translate(2.0, 0, 0);
-			if (pyramid) pyramid->translate(2.5, 0, 0);
-			
-			animationMode = 2;
-			printf("Animation: Solar system (House=Sun, Cube=Earth, Pyramid=Moon)\n");
-			glutTimerFunc(16, animationUpdate, 0);
+			{  // Add braces to create scope for variable declarations
+				// Reset objects for solar system
+				myWorld.reset();
+				Shape* house = myWorld.searchById(3);
+				Shape* cube = myWorld.searchById(1);
+				Shape* pyramid = myWorld.searchById(2);
+				if (house) house->translate(0, 0, 0);
+				if (cube) cube->translate(2.0, 0, 0);
+				if (pyramid) pyramid->translate(2.5, 0, 0);
+				
+				animationMode = 2;
+				printf("Animation: Solar system (House=Sun, Cube=Earth, Pyramid=Moon)\n");
+				glutTimerFunc(16, animationUpdate, 0);
+			}
 			break;
 		case 3:
 			animationMode = 0;

@@ -15,6 +15,11 @@ extern bool lightOn;
 
 Cube::Cube()
 {
+	// legacy per-object color kept for non-flat modes; global flatColor used for shadingMode==2
+	objectColor[0] = 0.7f;  // Red component
+	objectColor[1] = 0.2f;  // Green component
+	objectColor[2] = 0.2f;  // Blue component
+
 	// Set coordinate values for all vertices of a unit cube centered at origin
 	// Bottom face (z = -0.5)
 	vertex[0][0] = -0.5; vertex[0][1] = -0.5; vertex[0][2] = -0.5;
@@ -42,13 +47,19 @@ Cube::Cube()
 	// Left face
 	face[5][0] = 3; face[5][1] = 0; face[5][2] = 4; face[5][3] = 7;
 	
-	// Set face colors: red, green, blue, yellow, magenta, cyan
+	// Set face colors - arranged so no adjacent faces have same color
+	// Bottom face (looking down)
 	faceColors[0][0] = 1.0; faceColors[0][1] = 0.0; faceColors[0][2] = 0.0; // Red
+	// Top face (looking up)
 	faceColors[1][0] = 0.0; faceColors[1][1] = 1.0; faceColors[1][2] = 0.0; // Green
+	// Front face
 	faceColors[2][0] = 0.0; faceColors[2][1] = 0.0; faceColors[2][2] = 1.0; // Blue
+	// Right face
 	faceColors[3][0] = 1.0; faceColors[3][1] = 1.0; faceColors[3][2] = 0.0; // Yellow
-	faceColors[4][0] = 1.0; faceColors[4][1] = 0.0; faceColors[4][2] = 1.0; // Magenta
-	faceColors[5][0] = 0.0; faceColors[5][1] = 1.0; faceColors[5][2] = 1.0; // Cyan
+	// Back face
+	faceColors[4][0] = 0.0; faceColors[4][1] = 1.0; faceColors[4][2] = 1.0; // Cyan
+	// Left face
+	faceColors[5][0] = 1.0; faceColors[5][1] = 0.0; faceColors[5][2] = 1.0; // Magenta
 	
 	// Compute face normals
 	computeFaceNormals();
@@ -140,11 +151,121 @@ bool Cube::isBackFace(int faceIndex, GLfloat* modelview)
 void Cube::drawFace(int i)
 {
 	glBegin(GL_QUADS);
-	glNormal3fv(faceNormals[i]);
-	for (int j = 0; j < 4; j++) {
-		int vertexIndex = face[i][j];
-		glVertex3fv(vertex[vertexIndex]);
+
+	// If OpenGL shading modes:
+	// - shadingMode == 2 => Flat: one solid color per face (flat-lit)
+	// - shadingMode == 3 => Smooth: per-vertex normals and per-vertex colors (interpolated)
+	if (shadingMode == 2) {
+		// Enable depth test to prevent z-fighting
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
+        
+		// Determine displayed color (dim when lighting is on)
+		GLfloat appliedColor[3];
+		if (lightOn) {
+			appliedColor[0] = flatColor[0] * colorDimFactor;
+			appliedColor[1] = flatColor[1] * colorDimFactor;
+			appliedColor[2] = flatColor[2] * colorDimFactor;
+		} else {
+			appliedColor[0] = flatColor[0]; appliedColor[1] = flatColor[1]; appliedColor[2] = flatColor[2];
+		}
+
+		// Set up material properties using applied color
+		GLfloat mat_diffuse[] = {appliedColor[0], appliedColor[1], appliedColor[2], 1.0f};
+		GLfloat mat_specular[] = {0.3f, 0.3f, 0.3f, 1.0f};
+		GLfloat mat_shininess[] = {30.0f};
+		glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+		glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+		// Use face normal for flat shading
+		glNormal3fv(faceNormals[i]);
+        
+		// Apply the computed color
+		glColor3fv(appliedColor);
+
+		// Draw the face vertices
+		for (int j = 0; j < 4; j++) {
+			int vertexIndex = face[i][j];
+			glVertex3fv(vertex[vertexIndex]);
+		}
 	}
+	else if (shadingMode == 3) {
+		// set some specular/shininess (diffuse will be driven by glColor when color material enabled)
+		GLfloat mat_specular[] = {0.5f, 0.5f, 0.5f, 1.0f};
+		GLfloat mat_shininess[] = {50.0f};
+		glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+		glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+		// per-vertex processing
+		for (int j = 0; j < 4; j++) {
+			int vertexIndex = face[i][j];
+
+			// compute averaged vertex normal (for smooth shading)
+			GLfloat vertexNormal[3] = {0.0f, 0.0f, 0.0f};
+			int facesCount = 0;
+			for (int f = 0; f < 6; f++) {
+				for (int v = 0; v < 4; v++) {
+					if (face[f][v] == vertexIndex) {
+						vertexNormal[0] += faceNormals[f][0];
+						vertexNormal[1] += faceNormals[f][1];
+						vertexNormal[2] += faceNormals[f][2];
+						facesCount++;
+						break;
+					}
+				}
+			}
+			if (facesCount > 0) {
+				GLfloat len = sqrt(vertexNormal[0]*vertexNormal[0] + vertexNormal[1]*vertexNormal[1] + vertexNormal[2]*vertexNormal[2]);
+				if (len > 1e-6f) {
+					vertexNormal[0] /= len; vertexNormal[1] /= len; vertexNormal[2] /= len;
+				}
+			}
+
+			// compute averaged vertex color from adjacent faces
+			GLfloat vertexColor[3] = {0.0f, 0.0f, 0.0f};
+			int colorCount = 0;
+			for (int f = 0; f < 6; f++) {
+				for (int v = 0; v < 4; v++) {
+					if (face[f][v] == vertexIndex) {
+						vertexColor[0] += faceColors[f][0];
+						vertexColor[1] += faceColors[f][1];
+						vertexColor[2] += faceColors[f][2];
+						colorCount++;
+						break;
+					}
+				}
+			}
+			if (colorCount > 0) {
+				vertexColor[0] /= colorCount; vertexColor[1] /= colorCount; vertexColor[2] /= colorCount;
+			}
+
+			// For flat shading, use face normal; for smooth, use averaged vertex normal
+			if (shadingMode == 3) {
+				glNormal3fv(vertexNormal);
+			} else {
+				glNormal3fv(faceNormals[i]);
+			}
+
+			// set per-vertex color (used as material if GL_COLOR_MATERIAL is enabled)
+			if (lightOn) {
+				vertexColor[0] *= colorDimFactor; vertexColor[1] *= colorDimFactor; vertexColor[2] *= colorDimFactor;
+			}
+			glColor3fv(vertexColor);
+			glVertex3fv(vertex[vertexIndex]);
+		}
+	}
+	else {
+		// legacy non-OpenGL shading modes: use face normal and face color (shadingMode 0 or 1 handled elsewhere)
+		glNormal3fv(faceNormals[i]);
+		GLfloat* color = getFaceColor(i);
+		glColor3fv(color);
+		for (int j = 0; j < 4; j++) {
+			int vertexIndex = face[i][j];
+			glVertex3fv(vertex[vertexIndex]);
+		}
+	}
+
 	glEnd();
 }
 
@@ -173,6 +294,10 @@ void Cube::drawGeometry()
 	// Get modelview matrix for backface culling
 	GLfloat modelview[16];
 	glGetFloatv(GL_MODELVIEW_MATRIX, modelview);
+	
+	// Set consistent polygon offset for depth calculations
+	glEnable(GL_POLYGON_OFFSET_FILL);
+	glPolygonOffset(1.0, 1.0);
 	
 	// Draw based on shading mode
 	if (shadingMode == 0) {
@@ -241,7 +366,7 @@ void Cube::drawGeometry()
 					worldNormal[2] = modelview[2] * normal[0] + modelview[6] * normal[1] + modelview[10] * normal[2];
 					
 					// Diffuse lighting: Id = Rd * I * (n · s)
-					GLfloat Rd = 0.5;
+					GLfloat Rd = 0.8;  // Increased diffuse reflection
 					GLfloat I = myLight->getIntensity();
 					GLfloat dotNS = worldNormal[0] * lightVec[0] +
 					                worldNormal[1] * lightVec[1] +
@@ -249,19 +374,21 @@ void Cube::drawGeometry()
 					if (dotNS < 0) dotNS = 0;
 					
 					GLfloat intensity = Rd * I * dotNS;
-					finalColor[0] = color[0] * (0.2 + intensity);
-					finalColor[1] = color[1] * (0.2 + intensity);
-					finalColor[2] = color[2] * (0.2 + intensity);
+					finalColor[0] = color[0] * (0.4 + intensity);  // Increased ambient component
+					finalColor[1] = color[1] * (0.4 + intensity);
+					finalColor[2] = color[2] * (0.4 + intensity);
 				}
 				
 				glColor3fv(finalColor);
 			} else {
 				// OpenGL shading modes
 				GLfloat* color = getFaceColor(i);
-				GLfloat mat_diffuse[] = {color[0], color[1], color[2], 1.0f};
+				GLfloat appliedFaceColor[3] = {color[0], color[1], color[2]};
+				if (lightOn) { appliedFaceColor[0] *= colorDimFactor; appliedFaceColor[1] *= colorDimFactor; appliedFaceColor[2] *= colorDimFactor; }
+				GLfloat mat_diffuse[] = {appliedFaceColor[0], appliedFaceColor[1], appliedFaceColor[2], 1.0f};
 				GLfloat mat_specular[] = {0.5f, 0.5f, 0.5f, 1.0f};
 				GLfloat mat_shininess[] = {50.0f};
-				
+		
 				glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
 				glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 				glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
@@ -270,6 +397,35 @@ void Cube::drawGeometry()
 			drawFace(i);
 		}
 	}
-	
+}
+
+void Cube::draw()
+{
+	glPushMatrix();
+	this->ctmMultiply();
+	glScalef(s, s, s);
+	drawGeometry();
 	glPopMatrix();
+}
+
+void Cube::getVertexNormal(int vertexIndex, GLfloat out[3])
+{
+	// Average normals of faces that include this vertex
+	out[0] = out[1] = out[2] = 0.0f;
+	int count = 0;
+	for (int f = 0; f < 6; f++) {
+		for (int v = 0; v < 4; v++) {
+			if (face[f][v] == vertexIndex) {
+				out[0] += faceNormals[f][0];
+				out[1] += faceNormals[f][1];
+				out[2] += faceNormals[f][2];
+				count++;
+				break;
+			}
+		}
+	}
+	if (count > 0) {
+		GLfloat len = sqrt(out[0]*out[0] + out[1]*out[1] + out[2]*out[2]);
+		if (len > 1e-6f) { out[0] /= len; out[1] /= len; out[2] /= len; }
+	}
 }

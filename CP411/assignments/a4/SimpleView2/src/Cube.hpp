@@ -18,6 +18,7 @@ protected:
 	GLint face[6][4];          /* 2D array to store faces */
 	GLfloat faceColors[6][3];  /* Colors for each face */
 	GLfloat faceNormals[6][3]; /* Normal vectors for each face */
+	GLfloat objectColor[3];    /* Single solid color for flat shading */
 	GLfloat r, g, b;           /* legacy color cube */
 	
 	void computeFaceNormals();
@@ -30,6 +31,8 @@ public:
 	Cube();
 	void draw();
 	void drawFace(int);
+	void drawGeometry();  // Made public so House can use it
+	void getVertexNormal(int vertexIndex, GLfloat out[3]);
 };
 
 #endif

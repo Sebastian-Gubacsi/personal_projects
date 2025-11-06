@@ -24,6 +24,11 @@ int shadingMode = 0;  // 0=wireframe, 1=my constant, 2=OpenGL flat, 3=OpenGL smo
 int animationMode = 0; // 0=off, 1=single, 2=solar system
 bool lightOn = false;
 
+// Global uniform color used for OpenGL flat shading (mode 2)
+GLfloat flatColor[3] = {0.6f, 0.6f, 0.6f}; // default neutral gray
+// Dim factor applied to object colors when lighting is on (0 = black, 1 = unchanged)
+GLfloat colorDimFactor = 0.5f;
+
 Shape *selectObj = NULL;  // pointer to select object
 Light *myLight = NULL;
 
@@ -42,18 +47,34 @@ void display(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	myCamera.setProjectionMatrix();
 
+	// Always enable depth test except in wireframe mode
+	if (shadingMode > 0) {
+		glEnable(GL_DEPTH_TEST);
+	} else {
+		glDisable(GL_DEPTH_TEST);
+	}
+
 	// Setup lighting based on mode
 	if (shadingMode >= 2 && lightOn) {
-		// OpenGL lighting
+		// OpenGL lighting setup
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
+		
+		// Set global ambient light (brighter for better visibility)
+		GLfloat ambient[] = {0.8f, 0.8f, 0.8f, 1.0f};
+		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
+		
+		// Configure light properties
 		myLight->applyOpenGLLight(GL_LIGHT0);
 		
-		if (shadingMode == 2) {
-			glShadeModel(GL_FLAT);
-		} else {
-			glShadeModel(GL_SMOOTH);
-		}
+		// Use smooth interpolation for colors, but we'll use face normals
+		// in drawFace when shadingMode == 2 to achieve "flat-lit" faces
+		// while still showing multiple vertex colors across the face.
+		glShadeModel(GL_SMOOTH);
+		
+		// Enable color material for simpler material handling
+		glEnable(GL_COLOR_MATERIAL);
+		glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 	} else {
 		glDisable(GL_LIGHTING);
 	}
@@ -62,16 +83,11 @@ void display(void) {
 	if (cullingMode == 1) {
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
-		glEnable(GL_DEPTH_TEST);
 	} else {
 		glDisable(GL_CULL_FACE);
-		if (shadingMode > 0) {
-			glEnable(GL_DEPTH_TEST);
-		} else {
-			glDisable(GL_DEPTH_TEST);
-		}
 	}
 
+	// Draw world
 	myWorld.draw();
 	
 	// Draw light if on
@@ -146,11 +162,11 @@ void animationUpdate(int value) {
 			static bool initialized = false;
 			if (!initialized) {
 				house->reset();
-				house->translate(0, 0, 0);
+				house->translate(0, 0, 0); // Sun at center
 				cube->reset();
-				cube->translate(2.0, 0, 0);
+				cube->translate(2.0, 0, 0); // Earth 2 units from sun
 				pyramid->reset();
-				pyramid->translate(2.5, 0, 0);
+				pyramid->translate(0.5, 0, 0); // Moon 0.5 units from its orbit center
 				initialized = true;
 			}
 			
@@ -159,26 +175,25 @@ void animationUpdate(int value) {
 			sunAngle += 1.0;
 			
 			// Earth: orbit around sun and rotate around its own axis
-			cube->rotateOrigin(0, 0, 0, 0, 0, 1, 2.0); // Orbit
+			cube->rotateOrigin(0, 0, 0, 0, 0, 1, 2.0); // Orbit around sun
 			GLfloat ex = cube->getMC().mat[0][3];
 			GLfloat ey = cube->getMC().mat[1][3];
 			GLfloat ez = cube->getMC().mat[2][3];
 			GLfloat erx = cube->getMC().mat[0][2];
 			GLfloat ery = cube->getMC().mat[1][2];
 			GLfloat erz = cube->getMC().mat[2][2];
-			cube->rotate(ex, ey, ez, erx, ery, erz, 3.0); // Self rotation
+			cube->rotate(ex, ey, ez, erx, ery, erz, 3.0); // Earth self rotation
 			earthOrbitAngle += 2.0;
 			earthRotationAngle += 3.0;
 			
 			// Moon: orbit around earth and rotate around its own axis
-			pyramid->rotateOrigin(ex, ey, ez, 0, 0, 1, 5.0); // Orbit around earth
+			pyramid->reset(); // Reset to avoid accumulation of transformations
+			pyramid->translate(0.5, 0, 0); // Position relative to origin
+			pyramid->rotateOrigin(ex, ey, ez, 0, 0, 1, moonOrbitAngle); // Orbit around earth
 			GLfloat mx = pyramid->getMC().mat[0][3];
 			GLfloat my = pyramid->getMC().mat[1][3];
 			GLfloat mz = pyramid->getMC().mat[2][3];
-			GLfloat mrx = pyramid->getMC().mat[0][2];
-			GLfloat mry = pyramid->getMC().mat[1][2];
-			GLfloat mrz = pyramid->getMC().mat[2][2];
-			pyramid->rotate(mx, my, mz, mrx, mry, mrz, 4.0); // Self rotation
+			pyramid->rotate(mx, my, mz, 0, 0, 1, moonRotationAngle); // Moon self rotation
 			moonOrbitAngle += 5.0;
 			moonRotationAngle += 4.0;
 		}
@@ -190,22 +205,53 @@ void animationUpdate(int value) {
 	}
 }
 
-void init(void) {
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glEnable(GL_DEPTH_TEST);
-	selectObj = myWorld.searchById(1);  // Select cube by default
-	
-	// Initialize light
-	myLight = new Light(POINT_LIGHT, Point(), 1.0);
-	myLight->setPosition(5.0, 5.0, 5.0);
-	myLight->setColor(1.0, 1.0, 1.0);
-	
-	// Verify object was found
-	if (selectObj == NULL) {
-		printf("ERROR: Could not find object with ID 1\n");
-	} else {
-		printf("Initial object selected: ID = %d\n", selectObj->getId());
+// Function to initialize or reset all states
+void resetAll(void) {
+    // Reset all global states
+    csType = 1;       // Reset to MCS
+    transType = 4;    // Reset transform type
+    cullingMode = 0;  // Reset to no culling
+    shadingMode = 1;  // Set to constant shading (filled colors)
+    animationMode = 0; // Stop animation
+    lightOn = false;   // Turn off light
+    
+    // Reset camera
+    myCamera.reset();
+    
+    // Reset world and all objects
+    myWorld.reset();
+    
+    // Reset light position and properties
+	if (myLight != NULL) {
+		myLight->setPosition(2.0, 3.0, 3.0);  // Position above and slightly in front of scene center
+		myLight->setIntensity(6);  // Much brighter intensity
+		myLight->setColor(1.0, 1.0, 1.0);
 	}
+    
+    // Reset selection to cube
+    selectObj = myWorld.searchById(1);
+}
+
+void init(void) {
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glEnable(GL_DEPTH_TEST);
+    
+    // Initialize light if not exists
+	if (myLight == NULL) {
+		myLight = new Light(POINT_LIGHT, Point(), 6);  // Brighter initial intensity
+		myLight->setPosition(2.0, 3.0, 3.0);  // Position above and slightly in front of scene center
+		myLight->setColor(1.0, 1.0, 1.0);
+	}
+    
+    // Initialize all states
+    resetAll();
+    
+    // Verify object was found
+    if (selectObj == NULL) {
+        printf("ERROR: Could not find object with ID 1\n");
+    } else {
+        printf("Initial object selected: ID = %d\n", selectObj->getId());
+    }
 	
 	printf("\n=== Controls ===\n");
 	printf("Right-click for menu\n");
