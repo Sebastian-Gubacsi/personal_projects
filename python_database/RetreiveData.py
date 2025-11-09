@@ -3,4 +3,19 @@ this file will handle retrieving data from the database to display to an interfa
 '''
 
 import sqlite3
-from main import connection
+from InsertData import connection, BooksData
+
+# query data from the table
+result = connection.execute('SELECT * FROM books;')
+data = result.fetchall()
+print(data)
+
+# display queried data
+print('Books in Database:')
+for row in data:
+    print(f'Title: {row[1]}')
+    print(f'Author: {row[2]}')
+    print(f'Year: {row[3]}')
+    print('')
+
+connection.close()

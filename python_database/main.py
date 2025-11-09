@@ -38,4 +38,4 @@ for row in data:
 connection.commit()
 
 # closes the databases connection
-connection.close()
+# connection.close()
