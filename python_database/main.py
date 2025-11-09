@@ -16,9 +16,22 @@ BooksData = [
     ('Head First Python', 'Paul Barry', 2010),
     ('Clean Code', 'Robert C. Martin', 2008),
     ('The Pragmatic Programmer', 'Andrew Hunt and David Thomas', 1999),
-    ('Introduction to Algorithms', 'Thomas H. Cormen', 2009)
+    ('Introduction to Algorithms', 'Thomas H. Cormen', 2009),
 ]
-connection.execute('INSERT INTO books(title, author, year) VALUES (?, ?, ?);', BooksData[0])
+# connection.executemany('INSERT INTO books(title, author, year) VALUES (?, ?, ?);', BooksData)
+
+# query data from the table
+result = connection.execute('SELECT * FROM books;')
+data = result.fetchall()
+print(data)
+
+# display queried data
+print('Books in Database:')
+for row in data:
+    print(f'Title: {row[1]}')
+    print(f'Author: {row[2]}')
+    print(f'Year: {row[3]}')
+    print('')
 
 # writes data to database
 connection.commit()
