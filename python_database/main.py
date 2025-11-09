@@ -18,6 +18,7 @@ BooksData = [
     ('The Pragmatic Programmer', 'Andrew Hunt and David Thomas', 1999),
     ('Introduction to Algorithms', 'Thomas H. Cormen', 2009),
 ]
+
 # connection.executemany('INSERT INTO books(title, author, year) VALUES (?, ?, ?);', BooksData)
 
 # query data from the table
