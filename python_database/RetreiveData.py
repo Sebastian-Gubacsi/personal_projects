@@ -3,7 +3,7 @@ this file will handle retrieving data from the database to display to an interfa
 '''
 
 import sqlite3
-from InsertData import connection, BooksData
+from InsertData import connection, BooksData, database_name
 
 # query data from the table
 result = connection.execute('SELECT * FROM books;')
