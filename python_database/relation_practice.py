@@ -35,8 +35,8 @@ CoruseData = [
     ('Computer Science', 5),
 ]
 
-connection.executemany('INSERT INTO Students(name, age) VALUES (?, ?);', StudentData)
-connection.executemany('INSERT INTO Courses(name, Student_ID) VALUES (?, ?);', CoruseData)
+# connection.executemany('INSERT INTO Students(name, age) VALUES (?, ?);', StudentData)
+# connection.executemany('INSERT INTO Courses(name, Student_ID) VALUES (?, ?);', CoruseData)
 
 # query data from the table
 result = connection.execute('''

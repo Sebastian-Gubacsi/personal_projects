@@ -2,5 +2,5 @@
 create tables in different databases based on user input
 """
 
-from sqlite3 import connect
+import sqlite3
 from main import database_name, connection
