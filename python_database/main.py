@@ -1,6 +1,11 @@
+"""
+will support all logic and comunication with the sqlite databases and data manipulation
+"""
+
 import sqlite3
 
-connection = sqlite3.connect('demo_database.db')
+database_name = input("Enter the database name (with .db extension): ")
+connection = sqlite3.connect(database_name)
 connection.execute('''
                     CREATE TABLE IF NOT EXISTS books (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,4 +43,4 @@ for row in data:
 connection.commit()
 
 # closes the databases connection
-# connection.close()
+connection.close()
