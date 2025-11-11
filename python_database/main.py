@@ -3,6 +3,7 @@ will support all logic and comunication with the sqlite databases and data manip
 """
 
 import sqlite3
+from InsertData import insert_data
 '''
 from Interface import
 from InsertData import
@@ -52,4 +53,4 @@ for row in data:
 connection.commit()
 
 # closes the databases connection
-connection.close()
+# connection.close()
