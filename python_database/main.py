@@ -6,6 +6,7 @@ import sqlite3
 import InsertData as id
 import CreateTable as ct
 import CollectAndSortData as csd
+import RemoveData as rd
 '''
 from Interface import
 from RemoveData import
@@ -21,7 +22,8 @@ ct.create_table(connection)
 # insert data into the table
 id.data_insert(connection)
 
-
-
 # retrieve and display data
 csd.retrieve_data(connection)
+
+# remove data from the table based on ID input
+rd.remove_data(connection)
