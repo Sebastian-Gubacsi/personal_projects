@@ -13,13 +13,13 @@ from CreateDatabase import
 '''
 
 database_name = input("Enter the database name: ")
-connection = sqlite3.connect(database_name+'.db')
+connection = sqlite3.connect(database_name +'.db')
 
-# create a table in the database
-new_table = ct.create_table()
+# create a table in the database (pass the connection to avoid circular imports)
+ct.create_table(connection)
 
 # insert data into the table
-new_insert = id.data_insert()
+id.data_insert(connection)
 
 # retrieve and display data
-print(csd.retrieve_data())
+csd.retrieve_data(connection)

@@ -3,9 +3,15 @@ this file will handle inserting data into the database
 '''
 
 import sqlite3
-import main as m
 
-def data_insert():
+
+def data_insert(connection):
+    """
+    Insert sample book data into the provided sqlite3 `connection`.
+
+    Args:
+        connection: sqlite3.Connection object
+    """
     # insert data into the table
     BooksData = [
         ('The First Programmer', 'Andy Hunt', 1999),
@@ -14,20 +20,25 @@ def data_insert():
         ('The Pragmatic Programmer', 'Andrew Hunt and David Thomas', 1999),
         ('Introduction to Algorithms', 'Thomas H. Cormen', 2009),
     ]
+
     # variables
     count = 0
     length = len(BooksData)
     print(f'Inserting {length} records into the database.')
 
-    # the max will be relpaced with a button to add all data into the database of choice at once
-    max = int(input('How many records do you want to add? '))
+    # the max will be replaced with a button to add all data into the database of choice at once
+    try:
+        max_records = int(input('How many records do you want to add? '))
+    except ValueError:
+        print('Invalid number entered, defaulting to 0 additional records.')
+        max_records = 0
 
-    # insert data into the table
-    while count < max:
+    # insert placeholder records if user requested more
+    while count < max_records:
         BooksData.insert(length + count, ('Book title', 'test name', 2000))
         count += 1
 
-    m.connection.executemany('INSERT INTO books(title, author, year) VALUES (?, ?, ?);', BooksData)
+    connection.executemany('INSERT INTO books(title, author, year) VALUES (?, ?, ?);', BooksData)
     print('Data insertion complete.')
 
-    m.connection.commit()
+    connection.commit()
