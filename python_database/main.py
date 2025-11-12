@@ -3,8 +3,8 @@ will support all logic and comunication with the sqlite databases and data manip
 """
 
 import sqlite3
-from InsertData import insert_data
-from CreateTable import create_table
+import InsertData as id
+import CreateTable as ct
 '''
 from Interface import
 from InsertData import
@@ -16,19 +16,14 @@ from SortData import
 
 database_name = input("Enter the database name (with .db extension): ")
 connection = sqlite3.connect(database_name)
-create_table()
 
-
-# insert data into the table
-BooksData = [
-    ('The First Programmer', 'Andy Hunt', 1999),
-    ('Head First Python', 'Paul Barry', 2010),
-    ('Clean Code', 'Robert C. Martin', 2008),
-    ('The Pragmatic Programmer', 'Andrew Hunt and David Thomas', 1999),
-    ('Introduction to Algorithms', 'Thomas H. Cormen', 2009),
-]
+# create a table in the database
+new_table = ct.create_table()
 
 # connection.executemany('INSERT INTO books(title, author, year) VALUES (?, ?, ?);', BooksData)
+
+# insert data into the table
+new_insert = id.data_insert()
 
 # query data from the table
 result = connection.execute('SELECT * FROM books;')
