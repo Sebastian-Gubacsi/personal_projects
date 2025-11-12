@@ -2,9 +2,6 @@
 this file will handle inserting data into the database
 '''
 
-import sqlite3
-
-
 def data_insert(connection):
     """
     Insert sample book data into the provided sqlite3 `connection`.
