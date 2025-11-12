@@ -4,11 +4,11 @@ will support all logic and comunication with the sqlite databases and data manip
 
 import sqlite3
 from InsertData import insert_data
+from CreateTable import create_table
 '''
 from Interface import
 from InsertData import
 from RemoveData import
-from CreateTable import
 from CreateDatabase import
 from RetreiveData import
 from SortData import
@@ -16,14 +16,8 @@ from SortData import
 
 database_name = input("Enter the database name (with .db extension): ")
 connection = sqlite3.connect(database_name)
-connection.execute('''
-                    CREATE TABLE IF NOT EXISTS books (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        title text,
-                        author text,
-                        year INTEGER
-                    );
-''')
+create_table()
+
 
 # insert data into the table
 BooksData = [
