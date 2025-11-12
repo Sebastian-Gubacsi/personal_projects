@@ -20,6 +20,7 @@ def retrieve_data(connection):
     # display queried data
     print('Books in Database:')
     for row in data:
+        print(f'ID: {row[0]}')
         print(f'Title: {row[1]}')
         print(f'Author: {row[2]}')
         print(f'Year: {row[3]}')

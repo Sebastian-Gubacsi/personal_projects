@@ -21,5 +21,7 @@ ct.create_table(connection)
 # insert data into the table
 id.data_insert(connection)
 
+
+
 # retrieve and display data
 csd.retrieve_data(connection)
