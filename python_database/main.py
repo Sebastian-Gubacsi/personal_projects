@@ -15,8 +15,8 @@ from RetreiveData import
 from SortData import
 '''
 
-database_name = input("Enter the database name (with .db extension): ")
-connection = sqlite3.connect(database_name)
+database_name = input("Enter the database name: ")
+connection = sqlite3.connect(database_name+'.db')
 
 # create a table in the database
 new_table = ct.create_table()
@@ -26,25 +26,5 @@ new_table = ct.create_table()
 # insert data into the table
 new_insert = id.data_insert()
 
-print(csd.retrieve_data())  # retrieve and display data
-
-'''
-# query data from the table
-result = connection.execute('SELECT * FROM books;')
-data = result.fetchall()
-print(data)
-
-# display queried data
-print('Books in Database:')
-for row in data:
-    print(f'Title: {row[1]}')
-    print(f'Author: {row[2]}')
-    print(f'Year: {row[3]}')
-    print('')
-
-# writes data to database
-connection.commit()
-'''
-
-# closes the databases connection
-# connection.close()
+# retrieve and display data
+print(csd.retrieve_data())

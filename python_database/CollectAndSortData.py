@@ -2,14 +2,12 @@
 this file will handle retrieving data from the database to display to an interface.
 '''
 
-import sqlite3
-import InsertData as insert
+import main as m
 
 def retrieve_data():
     # query data from the table
-    result = insert.connection.execute('SELECT * FROM books;')
+    result = m.connection.execute('SELECT * FROM books;')
     data = result.fetchall()
-    print(data)
 
     # display queried data
     print('Books in Database:')
@@ -19,4 +17,4 @@ def retrieve_data():
         print(f'Year: {row[3]}')
         print('')
 
-    insert.connection.close()
+    m.connection.close()

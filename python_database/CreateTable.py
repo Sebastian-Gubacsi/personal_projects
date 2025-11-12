@@ -2,7 +2,6 @@
 create tables in different databases based on user input
 """
 
-import sqlite3
 import main as m
 
 def create_table():
