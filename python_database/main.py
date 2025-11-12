@@ -5,6 +5,7 @@ will support all logic and comunication with the sqlite databases and data manip
 import sqlite3
 import InsertData as id
 import CreateTable as ct
+import CollectAndSortData as csd
 '''
 from Interface import
 from InsertData import
@@ -25,6 +26,9 @@ new_table = ct.create_table()
 # insert data into the table
 new_insert = id.data_insert()
 
+print(csd.retrieve_data())  # retrieve and display data
+
+'''
 # query data from the table
 result = connection.execute('SELECT * FROM books;')
 data = result.fetchall()
@@ -40,6 +44,7 @@ for row in data:
 
 # writes data to database
 connection.commit()
+'''
 
 # closes the databases connection
 # connection.close()
