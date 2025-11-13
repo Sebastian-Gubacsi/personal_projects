@@ -16,21 +16,22 @@ from CreateDatabase import
 
 # variables and initial setup
 databases_dir = 'databases'
+display = True
+db_files = [f.replace('.db', '') for f in os.listdir(databases_dir) if f.endswith('.db')]
 
 # Create databases folder if it doesn't exist
 if not os.path.exists(databases_dir):
     os.makedirs(databases_dir)
 
-display = True
-db_files = [f.replace('.db', '') for f in os.listdir(databases_dir) if f.endswith('.db')]
 for i in range(len(db_files)):
     print(f"{i + 1}: {db_files[i]}")
 
 
 pos = int(input("Which database do you want to enter: "))
-connection = sqlite3.connect(db_files[pos - 1] +'.db')
+db_path = os.path.join(databases_dir, db_files[pos - 1] +'.db')
+connection = sqlite3.connect(db_path)
 
-# create a table in the database (pass the connection to avoid circular imports)
+# create a table in the database
 ct.create_table(connection)
 
 # insert data into the table
@@ -44,3 +45,5 @@ while display == True:
     again = input('Do you want to view and remove more books? (y/n): ')
     if again.lower() != 'y':
         display = False
+
+connection.close()

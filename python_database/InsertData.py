@@ -9,6 +9,7 @@ def data_insert(connection):
     Args:
         connection: sqlite3.Connection object
     """
+    '''
     # insert data into the table
     BooksData = [
         ('The First Programmer', 'Andy Hunt', 1999),
@@ -17,9 +18,11 @@ def data_insert(connection):
         ('The Pragmatic Programmer', 'Andrew Hunt and David Thomas', 1999),
         ('Introduction to Algorithms', 'Thomas H. Cormen', 2009),
     ]
+    '''
 
     # variables
     count = 0
+    BooksData = []
     length = len(BooksData)
     print(f'Inserting {length} records into the database.')
 
