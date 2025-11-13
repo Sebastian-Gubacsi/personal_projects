@@ -11,11 +11,6 @@ import InsertData as id
 import CreateTable as ct
 import CollectAndSortData as csd
 import RemoveData as rd
-'''
-from Interface import
-from RemoveData import
-from CreateDatabase import
-'''
 
 # run the program in command interface mod
 def cli_mode():
