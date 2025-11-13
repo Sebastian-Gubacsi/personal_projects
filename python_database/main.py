@@ -23,11 +23,12 @@ if not os.path.exists(databases_dir):
 
 display = True
 db_files = [f.replace('.db', '') for f in os.listdir(databases_dir) if f.endswith('.db')]
-print(db_files)
+for i in range(len(db_files)):
+    print(f"{i + 1}: {db_files[i]}")
 
-"""
-database_name = input("Enter the database name: ")
-connection = sqlite3.connect(database_name +'.db')
+
+pos = int(input("Which database do you want to enter: "))
+connection = sqlite3.connect(db_files[pos - 1] +'.db')
 
 # create a table in the database (pass the connection to avoid circular imports)
 ct.create_table(connection)
@@ -43,4 +44,3 @@ while display == True:
     again = input('Do you want to view and remove more books? (y/n): ')
     if again.lower() != 'y':
         display = False
-        """
