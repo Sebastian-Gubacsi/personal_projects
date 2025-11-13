@@ -19,8 +19,8 @@ def create_database(db_name):
     databases_dir = 'databases'
     
     # Create databases folder if it doesn't exist
-    #if not os.path.exists(databases_dir):
-        #os.makedirs(databases_dir)
+    if not os.path.exists(databases_dir):
+        os.makedirs(databases_dir)
     
     # Create full path to the database file
     db_path = os.path.join(databases_dir, db_name + '.db')
