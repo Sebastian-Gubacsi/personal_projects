@@ -27,6 +27,7 @@ class DatabaseInterface:
         if not os.path.exists(self.databases_dir):
             os.makedirs(self.databases_dir)
         
+        # Initialize UI first (this creates all widgets including status_label)
         self.setup_ui()
         
     def setup_ui(self):
@@ -38,7 +39,7 @@ class DatabaseInterface:
         
         self.db_combo = ttk.Combobox(db_frame, state="readonly", width=30)
         self.db_combo.grid(row=0, column=1, padx=5)
-        self.refresh_database_list()
+        # Don't call refresh here - it will be called after UI setup is complete
         
         ttk.Button(db_frame, text="Connect", command=self.connect_database).grid(row=0, column=2, padx=5)
         ttk.Button(db_frame, text="Refresh List", command=self.refresh_database_list).grid(row=0, column=3, padx=5)
@@ -87,9 +88,12 @@ class DatabaseInterface:
             db_files = [f.replace('.db', '') for f in os.listdir(self.databases_dir) 
                         if f.endswith('.db')]
             self.db_combo['values'] = db_files
+            
+            # Don't auto-select a database - let user choose
             if db_files:
-                self.db_combo.current(0)
-            self.status_label.config(text=f"Found {len(db_files)} database(s)")
+                self.status_label.config(text=f"Found {len(db_files)} database(s) - Please select and connect")
+            else:
+                self.status_label.config(text="No databases found - Create a new database to get started")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to list databases: {str(e)}")
     
