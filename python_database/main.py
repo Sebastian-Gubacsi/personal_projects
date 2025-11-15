@@ -61,19 +61,4 @@ def gui_mode():
     interface()
 
 if __name__ == "__main__":
-    print("Database Manager")
-    print("=" * 50)
-    print("Select mode:")
-    print("1. Command Line Interface (CLI)")
-    print("2. Graphical User Interface (GUI)")
-    print("=" * 50)
-    
-    choice = input("Enter your choice (1 or 2): ").strip()
-    
-    if choice == "1":
-        cli_mode()
-    elif choice == "2":
-        gui_mode()
-    else:
-        print("Invalid choice. Please run the program again.")
-        sys.exit(1)
+    gui_mode()
