@@ -13,7 +13,7 @@ import InsertData as id
 import CollectAndSortData as csd
 import RemoveData as rd
 import CreateDatabase as cd
-import TableManagement as tm
+import TableManagment as tm
 
 class DatabaseInterface:
     def __init__(self, root):
