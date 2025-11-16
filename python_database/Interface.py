@@ -82,6 +82,9 @@ class DatabaseInterface:
         self.status_label = ttk.Label(self.root, text="Not connected to any database", relief="sunken", anchor="w")
         self.status_label.pack(fill="x", side="bottom", padx=5, pady=2)
         
+        # Now that all UI is set up, refresh the database list
+        self.refresh_database_list()
+        
     def refresh_database_list(self):
         """Refresh the list of available databases"""
         try:
@@ -217,39 +220,72 @@ class DatabaseInterface:
             messagebox.showerror("Error", f"Failed to load data: {str(e)}")
     
     def insert_data(self):
-        """Insert data using InsertData module"""
+        """Insert multiple placeholder records into the current table"""
         if not self.connection:
             messagebox.showwarning("Warning", "Please connect to a database first")
             return
         
+        table_name = self.table_combo.get()
+        if not table_name:
+            messagebox.showwarning("Warning", "Please select a table")
+            return
+        
         try:
-            # Check if table exists first
+            # Get table structure
             cursor = self.connection.cursor()
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='books'")
-            if not cursor.fetchone():
-                messagebox.showwarning("Warning", "Please create the 'books' table first")
+            cursor.execute(f"PRAGMA table_info({table_name})")
+            columns_info = cursor.fetchall()
+            
+            # Filter out auto-increment columns
+            editable_columns = [col for col in columns_info 
+                              if 'AUTOINCREMENT' not in str(col).upper() and col[5] == 0]
+            
+            if not editable_columns:
+                messagebox.showwarning("Warning", "No editable columns found in this table")
                 return
             
             # Ask for number of records to add
             num_records = simpledialog.askinteger(
                 "Insert Records", 
-                "How many placeholder records do you want to add?",
-                minvalue=0,
+                f"How many placeholder records do you want to add to '{table_name}'?",
+                minvalue=1,
                 maxvalue=100
             )
             
-            if num_records is not None:
-                # Temporarily modify the InsertData module's behavior
-                # We'll create a custom insertion instead of using input()
-                BooksData = []
-                for i in range(num_records):
-                    BooksData.append(('Book title', 'test name', 2000))
+            if num_records is None:
+                return
+            
+            # Create placeholder data based on column types
+            records = []
+            for i in range(num_records):
+                record = []
+                for col in editable_columns:
+                    col_name = col[1]
+                    col_type = col[2].upper()
+                    
+                    # Generate placeholder based on type
+                    if 'INT' in col_type:
+                        record.append(0)
+                    elif 'REAL' in col_type or 'FLOAT' in col_type or 'DOUBLE' in col_type:
+                        record.append(0.0)
+                    else:  # TEXT, BLOB, etc.
+                        record.append(f'placeholder_{col_name}')
                 
-                self.connection.executemany('INSERT INTO books(title, author, year) VALUES (?, ?, ?);', BooksData)
-                self.connection.commit()
-                
-                messagebox.showinfo("Success", f"Inserted {num_records} placeholder record(s)")
-                self.load_data()
+                records.append(tuple(record))
+            
+            # Build INSERT query
+            column_names = [col[1] for col in editable_columns]
+            columns_str = ', '.join(column_names)
+            placeholders = ', '.join(['?' for _ in column_names])
+            query = f"INSERT INTO {table_name} ({columns_str}) VALUES ({placeholders})"
+            
+            # Insert records
+            self.connection.executemany(query, records)
+            self.connection.commit()
+            
+            messagebox.showinfo("Success", f"Inserted {num_records} placeholder record(s) into '{table_name}'")
+            self.load_data()
+            
         except Exception as e:
             messagebox.showerror("Error", f"Failed to insert data: {str(e)}")
     
