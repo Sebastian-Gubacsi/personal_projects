@@ -950,7 +950,7 @@ class DatabaseInterface:
                 # Create stats dialog
                 dialog = tk.Toplevel(self.root)
                 dialog.title(f"Table Statistics: {table_name}")
-                dialog.geometry("400x300")
+                dialog.geometry("500x400")
                 dialog.transient(self.root)
                 
                 # Display stats
