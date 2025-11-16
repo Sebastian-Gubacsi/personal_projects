@@ -88,6 +88,7 @@ class DatabaseInterface:
         ttk.Button(data_frame, text="🔄 Refresh Data", command=self.load_data).pack(side="left", padx=5)
         ttk.Button(data_frame, text="➕ Add Records", command=self.insert_data).pack(side="left", padx=5)
         ttk.Button(data_frame, text="✏️ Add Single Record", command=self.add_single_book).pack(side="left", padx=5)
+        ttk.Button(data_frame, text="📝 Edit Selected", command=self.edit_selected_record).pack(side="left", padx=5)
         ttk.Button(data_frame, text="🗑️ Delete Selected", command=self.delete_selected).pack(side="left", padx=5)
         
         # Row 2: Table operations
@@ -572,6 +573,197 @@ class DatabaseInterface:
         except Exception as e:
             messagebox.showerror("Error", f"Failed to delete record: {str(e)}")
     
+    def edit_selected_record(self):
+        """Edit the selected record from the current table"""
+        if not self.connection:
+            messagebox.showwarning("Warning", "Please connect to a database first")
+            return
+        
+        table_name = self.table_combo.get()
+        if not table_name:
+            messagebox.showwarning("Warning", "Please select a table")
+            return
+        
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showwarning("Warning", "Please select a record to edit")
+            return
+        
+        try:
+            cursor = self.connection.cursor()
+            
+            # Get table structure
+            cursor.execute(f"PRAGMA table_info({table_name})")
+            columns_info = cursor.fetchall()
+            
+            # Find primary key column
+            pk_column = None
+            for col in columns_info:
+                if col[5] == 1:  # col[5] is the pk flag
+                    pk_column = col[1]
+                    break
+            
+            if not pk_column:
+                pk_column = columns_info[0][1]  # Use first column if no PK
+            
+            # Get the selected record's data
+            item = self.tree.item(selected[0])
+            current_values = item['values']
+            pk_value = current_values[0]
+            
+            # Get full record as dictionary
+            record_dict = tm.get_record_as_dict(self.connection, table_name, pk_column, pk_value)
+            
+            if not record_dict:
+                messagebox.showerror("Error", "Could not retrieve record data")
+                return
+            
+            # Create edit dialog
+            dialog = tk.Toplevel(self.root)
+            dialog.title(f"Edit Record in {table_name}")
+            dialog.geometry("500x600")
+            dialog.transient(self.root)
+            dialog.grab_set()
+            
+            # Header
+            header_frame = ttk.Frame(dialog)
+            header_frame.pack(fill="x", padx=10, pady=10)
+            ttk.Label(header_frame, text=f"Editing Record: {pk_column} = {pk_value}", 
+                     font=("Arial", 11, "bold")).pack()
+            
+            # Create scrollable frame for fields
+            canvas = tk.Canvas(dialog)
+            scrollbar = ttk.Scrollbar(dialog, orient="vertical", command=canvas.yview)
+            scrollable_frame = ttk.Frame(canvas)
+            
+            scrollable_frame.bind(
+                "<Configure>",
+                lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+            )
+            
+            canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+            canvas.configure(yscrollcommand=scrollbar.set)
+            
+            # Create input fields for each column
+            entries = {}
+            for i, col in enumerate(columns_info):
+                col_id, col_name, col_type, not_null, default_val, is_pk = col
+                
+                # Create field frame
+                field_frame = ttk.Frame(scrollable_frame)
+                field_frame.grid(row=i, column=0, columnspan=3, padx=10, pady=8, sticky="ew")
+                
+                # Column label
+                label_text = col_name
+                if is_pk:
+                    label_text += " (Primary Key)"
+                
+                ttk.Label(field_frame, text=f"{label_text}:", 
+                         font=("Arial", 9, "bold")).grid(row=0, column=0, sticky="w")
+                
+                # Type and constraints info
+                constraint_text = f"Type: {col_type}"
+                if not_null:
+                    constraint_text += " | NOT NULL"
+                if default_val:
+                    constraint_text += f" | Default: {default_val}"
+                
+                ttk.Label(field_frame, text=constraint_text, 
+                         font=("Arial", 8), foreground="gray").grid(row=1, column=0, sticky="w", pady=(0, 5))
+                
+                # Entry field
+                entry = ttk.Entry(field_frame, width=50)
+                entry.grid(row=2, column=0, sticky="ew")
+                
+                # Set current value
+                current_val = record_dict.get(col_name, "")
+                if current_val is not None:
+                    entry.insert(0, str(current_val))
+                
+                # Disable primary key field (usually shouldn't be edited)
+                if is_pk:
+                    entry.config(state="disabled")
+                    ttk.Label(field_frame, text="(Primary keys cannot be edited)", 
+                             font=("Arial", 8), foreground="orange").grid(row=3, column=0, sticky="w")
+                
+                entries[col_name] = {
+                    'entry': entry,
+                    'is_pk': is_pk,
+                    'original': current_val
+                }
+                
+                field_frame.columnconfigure(0, weight=1)
+            
+            canvas.pack(side="left", fill="both", expand=True, padx=(10, 0), pady=10)
+            scrollbar.pack(side="right", fill="y", pady=10)
+            
+            def save_changes():
+                """Save the edited values"""
+                try:
+                    # Collect changes
+                    updates = {}
+                    changes_made = False
+                    
+                    for col_name, field_info in entries.items():
+                        if not field_info['is_pk']:  # Skip primary key
+                            entry_widget = field_info['entry']
+                            new_value = entry_widget.get().strip()
+                            original_value = field_info['original']
+                            
+                            # Check if value changed
+                            if str(new_value) != str(original_value):
+                                updates[col_name] = new_value
+                                changes_made = True
+                    
+                    if not changes_made:
+                        messagebox.showinfo("No Changes", "No changes were made to the record.")
+                        return
+                    
+                    # Show confirmation with changes
+                    change_summary = "\n".join([f"  • {col}: '{updates[col]}'" for col in updates])
+                    confirm = messagebox.askyesno(
+                        "Confirm Changes",
+                        f"Save these changes?\n\n{change_summary}\n\nTo record with {pk_column} = {pk_value}"
+                    )
+                    
+                    if confirm:
+                        # Use TableManagement module to update record
+                        result = tm.update_record(self.connection, table_name, pk_column, pk_value, updates)
+                        
+                        if result:
+                            messagebox.showinfo("Success", 
+                                              f"Record updated successfully!\n\n"
+                                              f"{len(updates)} field(s) changed.")
+                            dialog.destroy()
+                            self.load_data()
+                        else:
+                            messagebox.showerror("Error", "Failed to update record")
+                
+                except Exception as e:
+                    messagebox.showerror("Error", f"Failed to save changes: {str(e)}")
+            
+            def cancel_edit():
+                """Cancel editing without saving"""
+                confirm = messagebox.askyesno("Cancel", "Discard all changes?")
+                if confirm:
+                    dialog.destroy()
+            
+            # Buttons
+            button_frame = ttk.Frame(dialog)
+            button_frame.pack(side="bottom", fill="x", padx=10, pady=10)
+            
+            ttk.Button(button_frame, text="💾 Save Changes", 
+                      command=save_changes).pack(side="left", padx=5)
+            ttk.Button(button_frame, text="❌ Cancel", 
+                      command=cancel_edit).pack(side="left", padx=5)
+            
+            # Info label
+            ttk.Label(button_frame, text="Tip: Primary key fields cannot be edited", 
+                     font=("Arial", 8), foreground="gray").pack(side="right", padx=5)
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to open edit dialog: {str(e)}")
+    
     def create_custom_table_dialog(self):
         """Open dialog to create a custom table"""
         dialog = tk.Toplevel(self.root)
@@ -769,7 +961,7 @@ class DatabaseInterface:
         # Create dialog
         dialog = tk.Toplevel(self.root)
         dialog.title(f"Add Column to {table_name}")
-        dialog.geometry("450x350")
+        dialog.geometry("450x250")
         dialog.transient(self.root)
         dialog.grab_set()
         
@@ -950,7 +1142,7 @@ class DatabaseInterface:
                 # Create stats dialog
                 dialog = tk.Toplevel(self.root)
                 dialog.title(f"Table Statistics: {table_name}")
-                dialog.geometry("500x400")
+                dialog.geometry("400x300")
                 dialog.transient(self.root)
                 
                 # Display stats

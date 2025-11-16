@@ -1,8 +1,9 @@
 """
-this file will mange the table being access currently:
-- create cols
-- delete cols
-- make sure the displayed id updated everytime a item is added or removed (first column is always id 1, second is always id 2, etc)
+This file will manage the table being accessed currently:
+- Create columns
+- Delete columns
+- Reorder/reset IDs to ensure sequential ordering
+- Modify table structure
 """
 
 import sqlite3
@@ -282,3 +283,142 @@ def compact_table(connection, table_name):
         print(f"Error compacting table: {e}")
         connection.rollback()
         return False
+
+def update_record(connection, table_name, pk_column, pk_value, updates):
+    """
+    Update a specific record in the table.
+    
+    Args:
+        connection: sqlite3.Connection object
+        table_name: Name of the table
+        pk_column: Primary key column name
+        pk_value: Primary key value of the record to update
+        updates: Dictionary of column:value pairs to update
+                 Example: {'name': 'John', 'age': 30}
+    
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        if not updates:
+            print("No updates provided.")
+            return False
+        
+        # Build UPDATE query
+        set_clause = ", ".join([f"{col} = ?" for col in updates.keys()])
+        values = list(updates.values())
+        values.append(pk_value)
+        
+        query = f"UPDATE {table_name} SET {set_clause} WHERE {pk_column} = ?"
+        
+        cursor = connection.cursor()
+        cursor.execute(query, values)
+        connection.commit()
+        
+        if cursor.rowcount > 0:
+            print(f"Record updated successfully in '{table_name}'.")
+            return True
+        else:
+            print(f"No record found with {pk_column} = {pk_value}.")
+            return False
+    except Exception as e:
+        print(f"Error updating record: {e}")
+        connection.rollback()
+        return False
+
+def get_record(connection, table_name, pk_column, pk_value):
+    """
+    Retrieve a specific record from the table.
+    
+    Args:
+        connection: sqlite3.Connection object
+        table_name: Name of the table
+        pk_column: Primary key column name
+        pk_value: Primary key value of the record to retrieve
+    
+    Returns:
+        tuple: Record data as tuple, or None if not found
+    """
+    try:
+        cursor = connection.cursor()
+        cursor.execute(f"SELECT * FROM {table_name} WHERE {pk_column} = ?", (pk_value,))
+        record = cursor.fetchone()
+        return record
+    except Exception as e:
+        print(f"Error retrieving record: {e}")
+        return None
+
+def get_record_as_dict(connection, table_name, pk_column, pk_value):
+    """
+    Retrieve a specific record as a dictionary with column names as keys.
+    
+    Args:
+        connection: sqlite3.Connection object
+        table_name: Name of the table
+        pk_column: Primary key column name
+        pk_value: Primary key value of the record to retrieve
+    
+    Returns:
+        dict: Record data as dictionary, or None if not found
+    """
+    try:
+        cursor = connection.cursor()
+        
+        # Get column names
+        cursor.execute(f"PRAGMA table_info({table_name})")
+        columns = [col[1] for col in cursor.fetchall()]
+        
+        # Get record
+        cursor.execute(f"SELECT * FROM {table_name} WHERE {pk_column} = ?", (pk_value,))
+        record = cursor.fetchone()
+        
+        if record:
+            return dict(zip(columns, record))
+        return None
+    except Exception as e:
+        print(f"Error retrieving record: {e}")
+        return None
+
+def bulk_update(connection, table_name, pk_column, updates_list):
+    """
+    Update multiple records at once.
+    
+    Args:
+        connection: sqlite3.Connection object
+        table_name: Name of the table
+        pk_column: Primary key column name
+        updates_list: List of dictionaries, each containing 'pk_value' and 'updates'
+                     Example: [
+                         {'pk_value': 1, 'updates': {'name': 'John', 'age': 30}},
+                         {'pk_value': 2, 'updates': {'name': 'Jane', 'age': 25}}
+                     ]
+    
+    Returns:
+        int: Number of records successfully updated
+    """
+    try:
+        updated_count = 0
+        cursor = connection.cursor()
+        
+        for item in updates_list:
+            pk_value = item['pk_value']
+            updates = item['updates']
+            
+            if updates:
+                set_clause = ", ".join([f"{col} = ?" for col in updates.keys()])
+                values = list(updates.values())
+                values.append(pk_value)
+                
+                query = f"UPDATE {table_name} SET {set_clause} WHERE {pk_column} = ?"
+                cursor.execute(query, values)
+                
+                if cursor.rowcount > 0:
+                    updated_count += 1
+        
+        connection.commit()
+        print(f"Bulk update completed: {updated_count} records updated.")
+        return updated_count
+    except Exception as e:
+        print(f"Error during bulk update: {e}")
+        connection.rollback()
+        return 0
