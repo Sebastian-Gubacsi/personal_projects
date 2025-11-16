@@ -769,7 +769,7 @@ class DatabaseInterface:
         # Create dialog
         dialog = tk.Toplevel(self.root)
         dialog.title(f"Add Column to {table_name}")
-        dialog.geometry("450x250")
+        dialog.geometry("450x350")
         dialog.transient(self.root)
         dialog.grab_set()
         
