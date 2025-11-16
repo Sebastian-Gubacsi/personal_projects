@@ -13,6 +13,7 @@ import InsertData as id
 import CollectAndSortData as csd
 import RemoveData as rd
 import CreateDatabase as cd
+import TableManagement as tm
 
 class DatabaseInterface:
     def __init__(self, root):
@@ -72,11 +73,24 @@ class DatabaseInterface:
         action_frame = ttk.LabelFrame(self.root, text="Actions", padding=10)
         action_frame.pack(fill="x", padx=10, pady=5)
         
-        ttk.Button(action_frame, text="🔄 Refresh Data", command=self.load_data).pack(side="left", padx=5)
-        ttk.Button(action_frame, text="📋 Create Table", command=self.create_table).pack(side="left", padx=5)
-        ttk.Button(action_frame, text="➕ Add Records", command=self.insert_data).pack(side="left", padx=5)
-        ttk.Button(action_frame, text="✏️ Add Single Book", command=self.add_single_book).pack(side="left", padx=5)
-        ttk.Button(action_frame, text="🗑️ Delete Selected", command=self.delete_selected).pack(side="left", padx=5)
+        # Row 1: Data operations
+        data_frame = ttk.Frame(action_frame)
+        data_frame.pack(fill="x", pady=2)
+        
+        ttk.Button(data_frame, text="🔄 Refresh Data", command=self.load_data).pack(side="left", padx=5)
+        ttk.Button(data_frame, text="➕ Add Records", command=self.insert_data).pack(side="left", padx=5)
+        ttk.Button(data_frame, text="✏️ Add Single Record", command=self.add_single_book).pack(side="left", padx=5)
+        ttk.Button(data_frame, text="🗑️ Delete Selected", command=self.delete_selected).pack(side="left", padx=5)
+        
+        # Row 2: Table operations
+        table_frame = ttk.Frame(action_frame)
+        table_frame.pack(fill="x", pady=2)
+        
+        ttk.Button(table_frame, text="📋 Create Table", command=self.create_table).pack(side="left", padx=5)
+        ttk.Button(table_frame, text="➕ Add Column", command=self.add_column_dialog).pack(side="left", padx=5)
+        ttk.Button(table_frame, text="➖ Remove Column", command=self.remove_column_dialog).pack(side="left", padx=5)
+        ttk.Button(table_frame, text="🔢 Reset IDs", command=self.reset_table_ids).pack(side="left", padx=5)
+        ttk.Button(table_frame, text="📊 Table Stats", command=self.show_table_stats).pack(side="left", padx=5)
         
         # Status Bar
         self.status_label = ttk.Label(self.root, text="Not connected to any database", relief="sunken", anchor="w")
@@ -635,6 +649,233 @@ class DatabaseInterface:
             
         except Exception as e:
             messagebox.showerror("Error", f"Failed to get table info: {str(e)}")
+    
+    def add_column_dialog(self):
+        """Open dialog to add a new column to the current table"""
+        if not self.connection:
+            messagebox.showwarning("Warning", "Please connect to a database first")
+            return
+        
+        table_name = self.table_combo.get()
+        if not table_name:
+            messagebox.showwarning("Warning", "Please select a table")
+            return
+        
+        # Create dialog
+        dialog = tk.Toplevel(self.root)
+        dialog.title(f"Add Column to {table_name}")
+        dialog.geometry("450x250")
+        dialog.transient(self.root)
+        dialog.grab_set()
+        
+        # Column name
+        ttk.Label(dialog, text="Column Name:").grid(row=0, column=0, padx=10, pady=10, sticky="w")
+        name_entry = ttk.Entry(dialog, width=30)
+        name_entry.grid(row=0, column=1, padx=10, pady=10)
+        
+        # Data type
+        ttk.Label(dialog, text="Data Type:").grid(row=1, column=0, padx=10, pady=10, sticky="w")
+        type_combo = ttk.Combobox(dialog, width=28, 
+                                  values=["TEXT", "INTEGER", "REAL", "BLOB", "NUMERIC"],
+                                  state="readonly")
+        type_combo.grid(row=1, column=1, padx=10, pady=10)
+        type_combo.set("TEXT")
+        
+        # Constraints
+        ttk.Label(dialog, text="Constraints:").grid(row=2, column=0, padx=10, pady=10, sticky="w")
+        constraint_entry = ttk.Entry(dialog, width=30)
+        constraint_entry.grid(row=2, column=1, padx=10, pady=10)
+        
+        ttk.Label(dialog, text="(e.g., NOT NULL, DEFAULT 'value')", 
+                 font=("Arial", 8), foreground="gray").grid(row=3, column=1, padx=10, sticky="w")
+        
+        def add_column():
+            col_name = name_entry.get().strip()
+            col_type = type_combo.get()
+            constraints = constraint_entry.get().strip()
+            
+            if not col_name:
+                messagebox.showwarning("Warning", "Please enter a column name")
+                return
+            
+            try:
+                result = tm.add_column(self.connection, table_name, col_name, col_type, constraints)
+                if result:
+                    messagebox.showinfo("Success", f"Column '{col_name}' added successfully!")
+                    dialog.destroy()
+                    self.load_data()
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to add column: {str(e)}")
+        
+        # Buttons
+        button_frame = ttk.Frame(dialog)
+        button_frame.grid(row=4, column=0, columnspan=2, pady=20)
+        
+        ttk.Button(button_frame, text="Add Column", command=add_column).pack(side="left", padx=5)
+        ttk.Button(button_frame, text="Cancel", command=dialog.destroy).pack(side="left", padx=5)
+    
+    def remove_column_dialog(self):
+        """Open dialog to remove a column from the current table"""
+        if not self.connection:
+            messagebox.showwarning("Warning", "Please connect to a database first")
+            return
+        
+        table_name = self.table_combo.get()
+        if not table_name:
+            messagebox.showwarning("Warning", "Please select a table")
+            return
+        
+        try:
+            # Get current columns
+            cursor = self.connection.cursor()
+            cursor.execute(f"PRAGMA table_info({table_name})")
+            columns = cursor.fetchall()
+            column_names = [col[1] for col in columns]
+            
+            if len(column_names) <= 1:
+                messagebox.showwarning("Warning", "Cannot remove column. Table must have at least one column.")
+                return
+            
+            # Create dialog
+            dialog = tk.Toplevel(self.root)
+            dialog.title(f"Remove Column from {table_name}")
+            dialog.geometry("400x200")
+            dialog.transient(self.root)
+            dialog.grab_set()
+            
+            ttk.Label(dialog, text="Select column to remove:", 
+                     font=("Arial", 10, "bold")).pack(pady=20)
+            
+            # Column selector
+            col_combo = ttk.Combobox(dialog, width=30, values=column_names, state="readonly")
+            col_combo.pack(pady=10)
+            if column_names:
+                col_combo.current(0)
+            
+            ttk.Label(dialog, text="⚠️ Warning: This action cannot be undone!", 
+                     font=("Arial", 9), foreground="red").pack(pady=10)
+            
+            def remove_column():
+                col_name = col_combo.get()
+                if not col_name:
+                    messagebox.showwarning("Warning", "Please select a column")
+                    return
+                
+                confirm = messagebox.askyesno(
+                    "Confirm Deletion",
+                    f"Are you sure you want to remove column '{col_name}'?\n\nThis will delete all data in this column!"
+                )
+                
+                if confirm:
+                    try:
+                        result = tm.drop_column(self.connection, table_name, col_name)
+                        if result:
+                            messagebox.showinfo("Success", f"Column '{col_name}' removed successfully!")
+                            dialog.destroy()
+                            self.load_data()
+                    except Exception as e:
+                        messagebox.showerror("Error", f"Failed to remove column: {str(e)}")
+            
+            # Buttons
+            button_frame = ttk.Frame(dialog)
+            button_frame.pack(pady=20)
+            
+            ttk.Button(button_frame, text="Remove Column", command=remove_column).pack(side="left", padx=5)
+            ttk.Button(button_frame, text="Cancel", command=dialog.destroy).pack(side="left", padx=5)
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to open remove column dialog: {str(e)}")
+    
+    def reset_table_ids(self):
+        """Reset IDs in the current table to be sequential (1, 2, 3, ...)"""
+        if not self.connection:
+            messagebox.showwarning("Warning", "Please connect to a database first")
+            return
+        
+        table_name = self.table_combo.get()
+        if not table_name:
+            messagebox.showwarning("Warning", "Please select a table")
+            return
+        
+        try:
+            # Get table structure to find ID column
+            cursor = self.connection.cursor()
+            cursor.execute(f"PRAGMA table_info({table_name})")
+            columns = cursor.fetchall()
+            
+            # Find primary key or first column
+            id_column = None
+            for col in columns:
+                if col[5] == 1:  # Primary key
+                    id_column = col[1]
+                    break
+            
+            if not id_column:
+                id_column = columns[0][1]  # Use first column
+            
+            confirm = messagebox.askyesno(
+                "Confirm ID Reset",
+                f"Reset IDs in column '{id_column}' to be sequential (1, 2, 3, ...)?\n\n"
+                f"This will reorder all IDs in the '{table_name}' table."
+            )
+            
+            if confirm:
+                result = tm.reset_ids(self.connection, table_name, id_column)
+                if result:
+                    messagebox.showinfo("Success", "IDs reset successfully! All IDs are now sequential.")
+                    self.load_data()
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to reset IDs: {str(e)}")
+    
+    def show_table_stats(self):
+        """Show statistics about the current table"""
+        if not self.connection:
+            messagebox.showwarning("Warning", "Please connect to a database first")
+            return
+        
+        table_name = self.table_combo.get()
+        if not table_name:
+            messagebox.showwarning("Warning", "Please select a table")
+            return
+        
+        try:
+            stats = tm.get_table_stats(self.connection, table_name)
+            
+            if stats:
+                # Create stats dialog
+                dialog = tk.Toplevel(self.root)
+                dialog.title(f"Table Statistics: {table_name}")
+                dialog.geometry("400x300")
+                dialog.transient(self.root)
+                
+                # Display stats
+                info_frame = ttk.Frame(dialog, padding=20)
+                info_frame.pack(fill="both", expand=True)
+                
+                ttk.Label(info_frame, text=f"Table: {stats['table_name']}", 
+                         font=("Arial", 12, "bold")).pack(pady=10)
+                
+                ttk.Label(info_frame, text=f"Total Rows: {stats['row_count']}", 
+                         font=("Arial", 10)).pack(pady=5)
+                
+                ttk.Label(info_frame, text=f"Total Columns: {stats['column_count']}", 
+                         font=("Arial", 10)).pack(pady=5)
+                
+                ttk.Label(info_frame, text=f"Approximate Size: {stats['size_kb']} KB", 
+                         font=("Arial", 10)).pack(pady=5)
+                
+                ttk.Separator(info_frame, orient="horizontal").pack(fill="x", pady=10)
+                
+                ttk.Label(info_frame, text="Columns:", 
+                         font=("Arial", 10, "bold")).pack(pady=5)
+                
+                col_text = ", ".join(stats['columns'])
+                ttk.Label(info_frame, text=col_text, 
+                         font=("Arial", 9), wraplength=350).pack(pady=5)
+                
+                ttk.Button(dialog, text="Close", command=dialog.destroy).pack(pady=10)
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to get table statistics: {str(e)}")
     
     def on_closing(self):
         """Handle window close event"""
