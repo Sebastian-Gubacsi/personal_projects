@@ -13,7 +13,7 @@ import InsertData as id
 import CollectAndSortData as csd
 import RemoveData as rd
 import CreateDatabase as cd
-import TableManagment as tm
+import TableManagement as tm
 
 class DatabaseInterface:
     def __init__(self, root):
@@ -64,10 +64,18 @@ class DatabaseInterface:
         self.tree = ttk.Treeview(display_frame, show="headings", selectmode="browse")
         self.tree.pack(side="left", fill="both", expand=True)
         
-        # Scrollbar
-        scrollbar = ttk.Scrollbar(display_frame, orient="vertical", command=self.tree.yview)
-        scrollbar.pack(side="right", fill="y")
-        self.tree.configure(yscrollcommand=scrollbar.set)
+        # Bind sorting event to column headers
+        self.current_sort_column = None
+        self.sort_reverse = False
+        
+        # Scrollbars
+        scrollbar_y = ttk.Scrollbar(display_frame, orient="vertical", command=self.tree.yview)
+        scrollbar_y.pack(side="right", fill="y")
+        self.tree.configure(yscrollcommand=scrollbar_y.set)
+        
+        scrollbar_x = ttk.Scrollbar(self.root, orient="horizontal", command=self.tree.xview)
+        scrollbar_x.pack(fill="x", padx=10)
+        self.tree.configure(xscrollcommand=scrollbar_x.set)
         
         # Action Buttons Frame
         action_frame = ttk.LabelFrame(self.root, text="Actions", padding=10)
@@ -193,7 +201,7 @@ class DatabaseInterface:
                   command=dialog.destroy, width=20).pack(pady=5)
     
     def load_data(self):
-        """Load and display data from the selected table"""
+        """Load and display data from the selected table with sortable columns"""
         if not self.connection:
             messagebox.showwarning("Warning", "Please connect to a database first")
             return
@@ -217,8 +225,10 @@ class DatabaseInterface:
             # Configure treeview columns
             self.tree['columns'] = columns
             
+            # Set up sortable columns with click handlers
             for col in columns:
-                self.tree.heading(col, text=col.capitalize())
+                self.tree.heading(col, text=col.capitalize(), 
+                                 command=lambda c=col: self.sort_by_column(c, False))
                 # Adjust width based on column name length
                 self.tree.column(col, width=max(100, len(col) * 10))
             
@@ -226,15 +236,57 @@ class DatabaseInterface:
             cursor.execute(f"SELECT * FROM {table_name}")
             rows = cursor.fetchall()
             
-            for row in rows:
-                self.tree.insert("", "end", values=row)
+            # Store data with tags for sorting
+            for idx, row in enumerate(rows):
+                self.tree.insert("", "end", values=row, tags=(f'row{idx}',))
             
-            self.status_label.config(text=f"Loaded {len(rows)} record(s) from '{table_name}' table")
+            self.status_label.config(text=f"Loaded {len(rows)} record(s) from '{table_name}' table - Click column headers to sort")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to load data: {str(e)}")
     
+    def sort_by_column(self, col, reverse):
+        """Sort treeview contents when a column header is clicked"""
+        table_name = self.table_combo.get()
+        if not table_name:
+            return
+        
+        try:
+            # Get column index
+            columns = list(self.tree['columns'])
+            col_index = columns.index(col)
+            
+            # Get all data
+            data = [(self.tree.set(child, col), child) for child in self.tree.get_children('')]
+            
+            # Sort data
+            try:
+                # Try to sort as numbers first
+                data.sort(key=lambda t: float(t[0]) if t[0] else 0, reverse=reverse)
+            except (ValueError, TypeError):
+                # Fall back to string sorting
+                data.sort(key=lambda t: str(t[0]).lower(), reverse=reverse)
+            
+            # Rearrange items in sorted positions
+            for index, (val, child) in enumerate(data):
+                self.tree.move(child, '', index)
+            
+            # Update heading to show sort direction
+            for column in columns:
+                if column == col:
+                    direction = " ▼" if reverse else " ▲"
+                    self.tree.heading(column, text=column.capitalize() + direction,
+                                    command=lambda c=col: self.sort_by_column(c, not reverse))
+                else:
+                    self.tree.heading(column, text=column.capitalize(),
+                                    command=lambda c=column: self.sort_by_column(c, False))
+            
+            self.status_label.config(text=f"Sorted by '{col}' ({'descending' if reverse else 'ascending'})")
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to sort: {str(e)}")
+    
     def insert_data(self):
-        """Insert multiple placeholder records into the current table"""
+        """Insert multiple records with smart placeholder generation based on table structure"""
         if not self.connection:
             messagebox.showwarning("Warning", "Please connect to a database first")
             return
@@ -269,21 +321,72 @@ class DatabaseInterface:
             if num_records is None:
                 return
             
-            # Create placeholder data based on column types
+            # Create smart placeholder data based on column types and names
             records = []
             for i in range(num_records):
                 record = []
                 for col in editable_columns:
-                    col_name = col[1]
+                    col_name = col[1].lower()
                     col_type = col[2].upper()
                     
-                    # Generate placeholder based on type
+                    # Generate smart placeholders based on column name and type
                     if 'INT' in col_type:
-                        record.append(0)
+                        # Integer fields
+                        if 'age' in col_name:
+                            record.append(25 + i)
+                        elif 'year' in col_name:
+                            record.append(2024)
+                        elif 'quantity' in col_name or 'count' in col_name:
+                            record.append(i + 1)
+                        elif 'price' in col_name or 'cost' in col_name:
+                            record.append(100 + i * 10)
+                        else:
+                            record.append(i + 1)
+                    
                     elif 'REAL' in col_type or 'FLOAT' in col_type or 'DOUBLE' in col_type:
-                        record.append(0.0)
+                        # Float/Real fields
+                        if 'price' in col_name or 'cost' in col_name:
+                            record.append(99.99 + i)
+                        elif 'gpa' in col_name or 'score' in col_name:
+                            record.append(3.5 + (i * 0.1))
+                        elif 'rate' in col_name or 'percent' in col_name:
+                            record.append(75.0 + i)
+                        else:
+                            record.append(float(i + 1))
+                    
                     else:  # TEXT, BLOB, etc.
-                        record.append(f'placeholder_{col_name}')
+                        # Smart text placeholders based on column name
+                        if 'name' in col_name:
+                            names = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 'Henry']
+                            record.append(names[i % len(names)])
+                        elif 'email' in col_name:
+                            names = ['alice', 'bob', 'charlie', 'diana', 'eve', 'frank', 'grace', 'henry']
+                            record.append(f"{names[i % len(names)]}{i}@example.com")
+                        elif 'phone' in col_name:
+                            record.append(f"555-{1000 + i:04d}")
+                        elif 'address' in col_name:
+                            record.append(f"{100 + i} Main Street")
+                        elif 'city' in col_name:
+                            cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix']
+                            record.append(cities[i % len(cities)])
+                        elif 'title' in col_name:
+                            record.append(f"Item Title {i + 1}")
+                        elif 'description' in col_name or 'desc' in col_name:
+                            record.append(f"This is a description for item {i + 1}")
+                        elif 'author' in col_name:
+                            authors = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones']
+                            record.append(authors[i % len(authors)])
+                        elif 'category' in col_name or 'type' in col_name:
+                            categories = ['Category A', 'Category B', 'Category C']
+                            record.append(categories[i % len(categories)])
+                        elif 'status' in col_name:
+                            statuses = ['Active', 'Pending', 'Completed', 'Inactive']
+                            record.append(statuses[i % len(statuses)])
+                        elif 'date' in col_name or 'time' in col_name:
+                            record.append('2024-01-01')
+                        else:
+                            # Generic placeholder
+                            record.append(f'{col_name.replace("_", " ").title()} {i + 1}')
                 
                 records.append(tuple(record))
             
@@ -297,7 +400,9 @@ class DatabaseInterface:
             self.connection.executemany(query, records)
             self.connection.commit()
             
-            messagebox.showinfo("Success", f"Inserted {num_records} placeholder record(s) into '{table_name}'")
+            messagebox.showinfo("Success", 
+                              f"Inserted {num_records} smart placeholder record(s) into '{table_name}'!\n\n"
+                              f"Data generated based on column names and types.")
             self.load_data()
             
         except Exception as e:
@@ -543,7 +648,7 @@ class DatabaseInterface:
         
         # Add column button
         add_btn = ttk.Button(dialog, text="+ Add Column", 
-        command=lambda: add_column_row(len(column_entries) + 1))
+                            command=lambda: add_column_row(len(column_entries) + 1))
         add_btn.grid(row=2, column=0, columnspan=3, pady=10)
         
         # Info label
