@@ -19,24 +19,18 @@ def create_table(connection, table_name=None, columns=None):
         bool: True if successful, False otherwise
     """
     try:
-        if table_name is None or columns is None:
-            # Default books table
-            table_def = 'books (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, author TEXT, year INTEGER);'
-            connection.execute('CREATE TABLE IF NOT EXISTS ' + table_def)
-            print("Default 'books' table created successfully.")
-        else:
-            # Custom table
-            column_defs = []
-            for col in columns:
-                col_name, col_type, col_constraints = col
-                col_def = f"{col_name} {col_type}"
-                if col_constraints:
-                    col_def += f" {col_constraints}"
-                column_defs.append(col_def)
+        # Custom table
+        column_defs = []
+        for col in columns:
+            col_name, col_type, col_constraints = col
+            col_def = f"{col_name} {col_type}"
+            if col_constraints:
+                col_def += f" {col_constraints}"
+            column_defs.append(col_def)
             
-            table_def = f"{table_name} ({', '.join(column_defs)})"
-            connection.execute(f'CREATE TABLE IF NOT EXISTS {table_def};')
-            print(f"Custom table '{table_name}' created successfully.")
+        table_def = f"{table_name} ({', '.join(column_defs)})"
+        connection.execute(f'CREATE TABLE IF NOT EXISTS {table_def};')
+        print(f"Custom table '{table_name}' created successfully.")
         
         connection.commit()
         return True
